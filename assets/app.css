@@ -1,0 +1,128 @@
+/* ═══════════════════════════════════════════
+   assets/app.css  —  DESIGN TOKENS
+   ═══════════════════════════════════════════ */
+@font-face{
+  font-family:'Layiji';
+  src:url('fonts/Layiji.woff2') format('woff2');
+  font-weight:400 800;
+  font-display:block;
+  size-adjust:112%;   /* ชดเชยตัวอักษร Layiji ที่เล็กกว่าปกติ */
+}
+:root{
+  /* พื้น */
+  --paper:#EFE1C4;   --panel:#FBF6EA;   --card:#FFFDF7;
+  --line:#E6D4B2;    --line-2:#EBDCC0;  --rule:#EADBBE;
+  /* ตัวอักษร */
+  --ink:#4A3A2E;     --ink-hi:#5C4326;  --muted:#A8926E;  --dim:#B09A78;
+  /* ทอง */
+  --gold:#F1D486;    --gold-d:#E4A93C;  --gold-x:#C08A28;
+  --gold-pale:#FBEFC9; --gold-ring:#ECD08A; --gold-ink:#8A5A1E;
+  --wood:#6B4A2E;    --wood-d:#4E331F;  --wood-l:#8A6A48;
+  /* ชิป */
+  --tan:#F3E7CE;     --tan-ink:#9A8468;
+  /* สถานะ */
+  --green:#8FBE6E;   --green-x:#6E9B50; --green-ink:#5E8B4B;
+  --green-pale:#EAF2DC; --green-ring:#CADFB4;
+  --rose:#FBE3E4;    --rose-ink:#C56C77; --rose-ring:#F0C3C7;
+  --blue:#E1EEF3;    --blue-ink:#4E90AF; --blue-ring:#BFE0EC;
+  --plum:#F0E9F8;    --plum-ink:#8A6DB3;
+  /* เงาแข็ง = ลายเซ็นของธีม */
+  --lift-1:0 3px 0 rgba(190,160,110,.20);
+  --lift-2:0 4px 0 rgba(190,160,110,.30), 0 14px 30px rgba(120,90,40,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper); color:var(--ink); line-height:1.5;
+  font-family:'Layiji',-apple-system,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
+}
+button,input,select,textarea{font-family:inherit}
+input,select,textarea{line-height:1.5}
+a{color:inherit;text-decoration:none}
+svg{display:block}   /* กัน baseline gap เวลารูปอยู่ข้างข้อความ */
+::selection{background:var(--gold)}
+@keyframes twinkle{0%,100%{opacity:.35;transform:rotate(45deg) scale(.85)}50%{opacity:1;transform:rotate(45deg) scale(1)}}
+
+/* ── โครง ── */
+.wrap{padding:14px 12px 44px}
+.panel{max-width:680px;margin:0 auto;background:var(--panel);border:2px solid var(--line);
+       border-radius:26px;box-shadow:var(--lift-2);padding:16px 14px 22px}
+.brand{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 14px}
+.brand h1{margin:0;font-size:31px;font-weight:800;color:var(--ink-hi);letter-spacing:.3px}
+.spark{width:12px;height:12px;border-radius:2px;transform:rotate(45deg);animation:twinkle 2.6s ease-in-out infinite}
+
+/* ── ป้ายริบบิ้น (หัวข้อ) ── */
+.ribbon{display:flex;justify-content:center;margin:28px 0 14px}
+.ribbon > span{position:relative;background:var(--gold);color:var(--wood);font-weight:800;
+  font-size:19.5px;padding:8px 24px;border-radius:9px;
+  box-shadow:0 0 0 3px #F8E7B2, 0 3px 0 rgba(150,100,40,.3)}
+.ribbon > span::before,.ribbon > span::after{content:'';position:absolute;top:50%;
+  transform:translateY(-50%);border:11px solid transparent}
+.ribbon > span::before{left:-15px;border-right:13px solid #C99A45}
+.ribbon > span::after{right:-15px;border-left:13px solid #C99A45}
+
+/* ── การ์ด ── */
+.card{background:var(--card);border:2px solid var(--line-2);border-radius:16px;
+      padding:12px;box-shadow:var(--lift-1)}
+.row{display:flex;align-items:center;gap:11px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.grid{display:flex;flex-wrap:wrap;gap:10px}
+
+/* ── ชิป / แท็ก ── */
+.chip{font-weight:700;font-size:12.5px;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.chip.gold{background:var(--gold-pale);color:var(--gold-ink);box-shadow:0 0 0 1.5px var(--gold-ring)}
+.chip.green{background:var(--green-pale);color:var(--green-ink);box-shadow:0 0 0 1.5px var(--green-ring)}
+.chip.rose{background:var(--rose);color:var(--rose-ink);box-shadow:0 0 0 1.5px var(--rose-ring)}
+.chip.blue{background:var(--blue);color:var(--blue-ink);box-shadow:0 0 0 1.5px var(--blue-ring)}
+.chip.plain{background:var(--tan);color:#7A6A58;box-shadow:none;font-weight:600}
+
+/* ── ปุ่ม ── */
+.btn{border:0;border-radius:11px;padding:10px 14px;font-weight:700;font-size:16px;cursor:pointer;
+     min-height:44px}
+.btn.primary{background:var(--green);color:#fff;font-weight:800;box-shadow:0 3px 0 var(--green-x)}
+.btn.soft{background:var(--tan);color:var(--wood-l);box-shadow:0 3px 0 rgba(150,100,40,.14)}
+.btn.pill{border-radius:22px;padding:7px 15px;min-height:0;font-size:16px;
+          display:inline-flex;align-items:center;gap:7px}
+.btn.on{background:var(--gold);color:var(--wood);box-shadow:0 0 0 2px var(--gold-d)}
+.btn.off{background:var(--tan);color:var(--tan-ink);box-shadow:0 2px 0 rgba(150,100,40,.12)}
+.btn.danger{background:var(--rose-ink);color:#fff;box-shadow:none}
+.btn.dash{border:2px dashed #D9C08A;background:#FBF1D8;color:#9A6E2E;border-radius:15px;
+          width:100%;padding:12px}
+.btn:active{transform:translateY(1px)}
+
+/* ── โปรไฟล์ ── */
+.avatar{width:58px;height:58px;flex:0 0 58px;border-radius:15px;background:#F5EAD2;
+        box-shadow:inset 0 0 0 2px var(--line);display:flex;align-items:center;
+        justify-content:center;font-size:35px;cursor:pointer;overflow:hidden}
+.nameIn{width:100%;border:0;background:transparent;font-weight:700;font-size:22px;
+        color:var(--ink);outline:none;line-height:1.5;padding:2px 0}
+.lvbox{flex:0 0 auto;text-align:center;background:var(--gold);border-radius:14px;
+       padding:7px 12px;box-shadow:0 0 0 2px var(--gold-ring)}
+.lvbox b{display:block;font-size:23px;color:var(--wood);line-height:1}
+.lvbox small{font-weight:700;font-size:12px;color:var(--gold-ink)}
+
+/* ── แถบเลเวล ── */
+.lvbar{position:relative;height:16px;background:#EDE0C6;border-radius:9px;margin:14px 6px 4px;
+       box-shadow:inset 0 0 0 2px #E2D2B0}
+.lvfill{height:100%;border-radius:9px;background:linear-gradient(90deg,#F6D372,#E4A93C);
+        transition:width .6s}
+.hero{position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;
+      border-radius:9px;background:var(--gold);box-shadow:0 0 0 2px var(--gold-d),0 2px 4px rgba(0,0,0,.16);
+      display:flex;align-items:center;justify-content:center;font-size:16px;transition:left .6s}
+.hint{text-align:center;font-size:13px;color:var(--muted);margin-bottom:4px}
+
+/* ── progress เล็ก ── */
+.pbar{height:9px;background:#EFE3C8;border-radius:6px;margin-top:11px;overflow:hidden}
+.pbar > i{display:block;height:100%;border-radius:6px;
+          background:linear-gradient(90deg,#F6D372,#E4A93C);transition:width .6s}
+
+/* ── กล่องว่าง ── */
+.empty{text-align:center;color:var(--muted);font-size:15.5px;background:var(--card);
+       border:2px dashed #E0CFAC;border-radius:15px;padding:18px}
+.field{width:100%;border:2px solid var(--line);background:var(--panel);border-radius:10px;
+       padding:9px 11px;font-size:16px;color:var(--ink);outline:none}
+.msg{text-align:center;font-size:14.5px;color:#9A8468;margin-top:12px;min-height:20px}
+.tile{width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:#F5EAD2;
+      box-shadow:inset 0 0 0 2px var(--line);display:flex;align-items:center;
+      justify-content:center;font-size:24px}

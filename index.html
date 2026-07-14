@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!-- ══════════════════════════════════════════════════════════
+     Study Valley — หน้าแรก (ตัวอย่าง)
+
+     โครงไฟล์:
+       assets/app.css            — ธีม + design token + @font-face
+       assets/art.js             — SVG (C, svg, ART) โหลดก่อน
+       assets/app.js             — ข้อมูลจำลอง + logic (ใช้ ART/C)
+       assets/fonts/Layiji.woff2 — ฟอนต์ (เปิดออฟไลน์ได้)
+
+     ฟอนต์ Layiji เป็นตัว patch แล้ว — ห้ามเอาไฟล์ต้นฉบับมาใช้ซ้ำ
+     รายละเอียดบั๊กและวิธีแก้อยู่ใน THEME.md
+     ══════════════════════════════════════════════════════════ -->
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Study Valley</title>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div class="wrap">
+<div class="panel">
+
+  <div class="brand">
+    <div class="spark" style="background:var(--gold)"></div>
+    <h1>Study Valley</h1>
+    <div class="spark" style="background:var(--green-ring);animation-delay:.6s"></div>
+  </div>
+
+  <!-- สลับคน -->
+  <div class="grid" style="justify-content:center;gap:8px;margin-bottom:14px" id="who"></div>
+
+  <!-- การ์ดโปรไฟล์ -->
+  <div class="card row">
+    <div class="avatar" id="av"></div>
+    <div style="flex:1;min-width:0">
+      <input class="nameIn" id="nm" placeholder="ชื่อ">
+      <button id="avBtn" style="border:0;background:transparent;color:var(--dim);font-weight:600;
+        font-size:12.5px;cursor:pointer;padding:2px 0">เปลี่ยนรูปประจำตัว ▾</button>
+    </div>
+    <div class="lvbox"><b id="lv">Lv 1</b><small id="xp">0 XP</small></div>
+  </div>
+
+  <!-- เลือกอีโมจิ -->
+  <div class="card" id="avPick" style="margin-top:8px;display:none">
+    <div class="grid" style="justify-content:center;gap:8px" id="emo"></div>
+  </div>
+
+  <!-- แถบเลเวล -->
+  <div class="lvbar">
+    <div class="lvfill" id="lvfill" style="width:0%"></div>
+    <div class="hero" id="heroPin" style="left:4%"></div>
+  </div>
+  <div class="hint" id="toNext">อีก 1000 XP จะเลเวลอัป</div>
+
+  <!-- เป้าหมาย -->
+  <div class="ribbon"><span>เป้าหมายของฉัน</span></div>
+  <div class="stack" id="goals"></div>
+  <div style="height:10px"></div>
+  <button class="btn dash" id="addBtn">+ เพิ่มเป้าหมาย</button>
+
+  <div class="card" id="addForm" style="margin-top:10px;display:none">
+    <input class="field" id="gTitle" placeholder="ชื่อเป้าหมาย เช่น สอบ สอวน. รอบแรก">
+    <div class="grid" style="margin-top:9px;gap:8px">
+      <button class="btn on" data-kind="exam"  style="flex:1">มีวันสอบ</button>
+      <button class="btn off" data-kind="daily" style="flex:1">ทบทวนรายวัน</button>
+    </div>
+    <input class="field" type="date" id="gDate" style="margin-top:9px">
+    <select class="field" id="gRoom" style="margin-top:9px">
+      <option value="">ไม่ผูกกับห้องเรียน</option>
+      <option value="posn">สอวน. คอมพิวเตอร์</option>
+      <option value="english">คลังคำศัพท์อังกฤษ</option>
+    </select>
+    <div class="grid" style="margin-top:11px;gap:8px">
+      <button class="btn primary" id="gSave" style="flex:1">บันทึก</button>
+      <button class="btn soft" id="gCancel">ยกเลิก</button>
+    </div>
+  </div>
+
+  <!-- หมุดหมาย -->
+  <div class="ribbon"><span>หมุดหมายความคืบหน้า</span></div>
+  <div class="grid" id="weeks"></div>
+
+  <!-- ห้องเรียน -->
+  <div class="ribbon"><span>ห้องเรียน</span></div>
+  <div class="grid">
+    <a class="card row" href="posn/" style="flex:1;min-width:220px">
+      <div class="tile" id="rmA"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:18px">สอวน. คอมพิวเตอร์</div>
+        <div style="font-size:14px;color:var(--muted);margin:1px 0 5px">เลข + คอม • 29 ชุด</div>
+        <div class="grid" style="gap:5px">
+          <span class="chip green">ทำแล้ว 21</span><span class="chip gold">72%</span>
+        </div>
+      </div>
+    </a>
+    <a class="card row" href="english/" style="flex:1;min-width:220px">
+      <div class="tile" id="rmB"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:18px">คลังคำศัพท์อังกฤษ</div>
+        <div style="font-size:14px;color:var(--muted);margin:1px 0 5px">เกมกู้ภัยจรวด • เลือกระดับเองได้</div>
+        <div class="grid" style="gap:5px"><span class="chip blue">3 ระดับ</span></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="grid" style="margin-top:14px;gap:8px">
+    <button class="btn soft" style="flex:1">สำรองผล</button>
+    <button class="btn soft" style="flex:1">กู้คืน</button>
+  </div>
+  <div class="msg" id="msg"></div>
+
+</div>
+</div>
+<script src="assets/art.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
