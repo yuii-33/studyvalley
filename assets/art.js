@@ -107,4 +107,33 @@ const ART = {
     <path d="M27 54V22a5 5 0 0 1 10 0v32z" fill="${C.green}"/>
     <path d="M27 34h-6a4 4 0 0 1-4-4v-4M37 30h6a4 4 0 0 0 4-4v-6" fill="none" stroke="${C.green_d}" stroke-width="6"/>
     <path d="M20 54h24" stroke="${C.wood_d}" stroke-width="3"/>`, s),
+
+  /* ── เอนจินทำโจทย์ ── */
+  bulb: s => svg(`
+    <path d="M32 12c-8 0-14 6-14 13 0 5 3 8 5 12h18c2-4 5-7 5-12 0-7-6-13-14-13z" fill="${C.gold}" stroke="${C.gold_x}"/>
+    <path d="M25 43h14M27 48h10" stroke="${C.gold_x}" stroke-width="2.4"/>
+    <path d="M32 6v3M13 15l2.5 2.5M51 15l-2.5 2.5M10 31h3M51 31h3" stroke="${C.gold_d}" stroke-width="2"/>`, s),
+
+  note: s => svg(`
+    <path d="M16 12h24l8 8v32a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V14a2 2 0 0 1 2-2z" fill="${C.paper}" stroke="${C.line}"/>
+    <path d="M40 12v8h8" fill="${C.cream}" stroke="${C.line}"/>
+    <path d="M21 30h22M21 37h22M21 44h14" stroke="${C.blue_d}" stroke-width="2.2"/>`, s),
+
+  sure: s => svg(`
+    <circle cx="32" cy="32" r="21" fill="${C.green}" stroke="${C.green_d}"/>
+    <path d="M22 33l7 7 14-15" stroke="${C.white}" stroke-width="3.4"/>`, s),
+
+  unsure: s => svg(`
+    <circle cx="32" cy="32" r="21" fill="${C.gold}" stroke="${C.gold_x}"/>
+    <path d="M26 27c0-4 3-6.5 6.5-6.5S39 23 39 27c0 4-5 5-6 8v2" stroke="${C.gold_x}" stroke-width="3"/>
+    <circle cx="32" cy="45" r="2.2" fill="${C.gold_x}" stroke="none"/>`, s),
+
+  alert: s => svg(`
+    <path d="M32 12 54 50a2 2 0 0 1-2 3H12a2 2 0 0 1-2-3z" fill="${C.rose}" stroke="${C.rose_d}"/>
+    <path d="M32 26v12" stroke="${C.white}" stroke-width="3.4"/>
+    <circle cx="32" cy="45" r="2.4" fill="${C.white}" stroke="none"/>`, s),
+
+  grid: s => svg(`
+    <rect x="12" y="14" width="40" height="36" rx="4" fill="${C.cream}" stroke="${C.line}"/>
+    <path d="M12 26h40M12 38h40M26 14v36M39 14v36" stroke="${C.wood_d}" stroke-width="2"/>`, s),
 };

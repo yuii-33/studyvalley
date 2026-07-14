@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- ══════════════════════════════════════════════════════════
+     posn/set.html — เอนจินทำโจทย์
+     อ่านชุดจาก ../data/posn/<id>.json (ระบุด้วย ?id=<id>)
+     ไม่มี ?id → โชว์รายการชุดจาก index.json ให้เลือก
+     ══════════════════════════════════════════════════════════ -->
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ทำโจทย์ • Study Valley</title>
+<link rel="stylesheet" href="../assets/app.css">
+<link rel="stylesheet" href="../assets/set.css">
+</head>
+<body>
+<div class="wrap">
+<div class="panel">
+
+  <div class="setbar">
+    <a class="backlink" href="../index.html">กลับ</a>
+    <div class="settitle" id="settitle">Study Valley</div>
+    <div class="timer" id="timer" style="display:none">0:00</div>
+  </div>
+
+  <div id="picker" style="display:none"></div>
+
+  <div id="quiz" style="display:none">
+
+    <div class="qprog"><i id="qprogfill"></i></div>
+    <div class="qmeta"><span id="qcount"></span><span id="qtarget"></span></div>
+
+    <div class="card qcard">
+      <div class="badges" id="badges"></div>
+      <div class="qbody" id="qbody"></div>
+      <button class="hintbtn" id="hintbtn" style="display:none"></button>
+      <div class="trbox" id="trbox" style="display:none"></div>
+    </div>
+
+    <div class="choices" id="choices"></div>
+    <div id="fillwrap" style="display:none">
+      <input class="field fillin" id="fillin" placeholder="พิมพ์คำตอบ" autocomplete="off">
+    </div>
+
+    <div class="conf" id="conf">
+      <div class="conflabel">มั่นใจแค่ไหน ก่อนดูเฉลย</div>
+      <div class="confbtns">
+        <button class="confbtn" id="btnSure"></button>
+        <button class="confbtn" id="btnUnsure"></button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="btnReveal">เฉลย</button>
+      <button class="btn soft" id="btnClear">ล้าง</button>
+      <button class="btn soft" id="btnDontknow">ไม่รู้เลย</button>
+    </div>
+
+    <div class="exbox" id="exbox" style="display:none">
+      <div class="exhead" id="exhead"></div>
+      <div class="excontent" id="excontent"></div>
+    </div>
+
+    <div class="nav">
+      <button class="btn soft" id="btnPrev">ก่อนหน้า</button>
+      <button class="btn primary" id="btnNext">ถัดไป</button>
+    </div>
+
+  </div>
+
+  <div id="summary" style="display:none"></div>
+
+</div>
+</div>
+<script src="../assets/art.js"></script>
+<script src="../assets/set.js"></script>
+</body>
+</html>
