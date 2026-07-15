@@ -274,7 +274,12 @@ function bindActions(){
   $('fillin').oninput  = e => { ans[cur].pick = e.target.value; ans[cur].dk = false; save(); };
   $('btnSure').onclick   = () => { toggleConf('sure'); };
   $('btnUnsure').onclick = () => { toggleConf('unsure'); };
-  $('btnReveal').onclick = () => { ans[cur].revealed = true; save(); renderQuestion(); };
+  $('btnReveal').onclick = () => {
+    const a = ans[cur], q = SET.questions[cur];
+    a.revealed = true;
+    if(!a.dk && a.pick != null && eqAns(a.pick, q.c) && typeof XP !== 'undefined') XP.award('p:'+SET.id+':'+cur, XP.BASE_POSN);
+    save(); renderQuestion();
+  };
   $('btnClear').onclick  = () => { const a = ans[cur]; a.pick = null; a.conf = null; a.dk = false; save(); renderQuestion(); };
   $('btnDontknow').onclick = () => { const a = ans[cur]; a.dk = true; a.pick = null; a.revealed = true; save(); renderQuestion(); };
   $('btnPrev').onclick = () => { if(cur > 0){ cur--; save(); renderQuestion(); } };

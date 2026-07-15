@@ -17,8 +17,7 @@ const thDate = s => { const d = new Date(s+'T00:00:00');
   return d.getDate()+' '+TH_M[d.getMonth()]+' '+(d.getFullYear()+543); };
 const daysLeft = s => Math.ceil((new Date(s+'T00:00:00') - new Date().setHours(0,0,0,0))/864e5);
 
-/* ── คะแนน : XP = ข้อที่ตอบถูก × 10 · เลเวลทุก 200 XP ── */
-const XP_PER = 10, LVL = 200;
+/* ── คะแนน : ใช้โมดูล XP กลาง (assets/xp.js) — สม่ำเสมอ + cap รายวัน ── */
 
 /* ── เซฟโปรไฟล์ 2 ที่ : localStorage + IndexedDB ── */
 const SCHEMA = 2;                 // v2 = โปรไฟล์เดียว (ของเก่า v1 ถูกมองข้าม = ล้างของเดิม)
@@ -94,7 +93,7 @@ function render(){
   Object.keys(scores).forEach(id => { const s = scores[id];
     totCorrect += s.correct||0; totAnswered += s.answered||0;
     if((s.done||0) > 0) attempted++; });
-  const XP = totCorrect * XP_PER;
+  const xpTotal = XP.total(), level = XP.level(), inLv = XP.inLevel(), pct = Math.round(inLv/XP.PER_LEVEL*100);
 
   /* โปรไฟล์ */
   $('nm').value = store.name;
@@ -102,12 +101,13 @@ function render(){
   $('heroPin').innerHTML = ART[store.art](18);
 
   /* เลเวล */
-  const level = Math.floor(XP/LVL)+1, inLv = XP%LVL, pct = Math.round(inLv/LVL*100);
   $('lv').textContent = 'Lv '+level;
-  $('xp').textContent = XP.toLocaleString()+' XP';
+  $('xp').textContent = xpTotal.toLocaleString()+' XP';
   $('lvfill').style.width = pct+'%';
   $('heroPin').style.left = Math.min(96,Math.max(4,pct))+'%';
-  $('toNext').textContent = XP === 0 ? 'เริ่มทำโจทย์เพื่อเก็บ XP' : 'อีก '+(LVL-inLv)+' XP จะเลเวลอัป';
+  const st = XP.streak();
+  $('toNext').textContent = (xpTotal===0 ? 'เริ่มทำโจทย์เพื่อเก็บ XP' : 'อีก '+(XP.PER_LEVEL-inLv)+' XP จะเลเวลอัป')
+    + (st>1 ? ' • ต่อเนื่อง '+st+' วัน' : '');
 
   /* รูปประจำตัว */
   $('emo').innerHTML = '';
@@ -190,7 +190,7 @@ function renderWeeks(scores){
     if(!ids.length){ box.innerHTML = '<div class="empty">ยังไม่มีผลทำโจทย์ — เริ่มที่ห้องเรียนด้านล่าง</div>'; return; }
     let correct = 0, done = 0;
     ids.forEach(id=>{ correct += scores[id].correct||0; done += (scores[id].done>0?1:0); });
-    box.innerHTML = weekCard('ผลรวม', 'chest', done, ids.length, correct*XP_PER, ids.length?Math.round(done/ids.length*100):0);
+    box.innerHTML = weekCard('ผลรวม', 'chest', done, ids.length, correct, ids.length?Math.round(done/ids.length*100):0);
     return;
   }
   const W = {}, order = [];
@@ -205,10 +205,10 @@ function renderWeeks(scores){
   order.sort((a,b)=>a-b);
   box.innerHTML = order.map((wk,i)=>{
     const w = W[wk], p = w.sets ? Math.round(w.done/w.sets*100) : 0;
-    return weekCard('สัปดาห์ '+wk, arts[i%arts.length], w.done, w.sets, w.correct*XP_PER, p);
+    return weekCard('สัปดาห์ '+wk, arts[i%arts.length], w.done, w.sets, w.correct, p);
   }).join('');
 }
-function weekCard(label, art, done, total, xp, p){
+function weekCard(label, art, done, total, correct, p){
   return '<div class="card" style="flex:1;min-width:210px">'+
     '<div class="row">'+
       '<div class="tile">'+ART[art](28)+'</div>'+
@@ -216,7 +216,7 @@ function weekCard(label, art, done, total, xp, p){
         '<div style="font-weight:600;font-size:14px;color:var(--dim)">'+label+'</div>'+
         '<div style="font-weight:800;font-size:17.5px">ทำได้ '+done+'/'+total+' ชุด</div>'+
       '</div>'+
-      '<span class="chip gold" style="font-weight:800;font-size:14px;padding:4px 9px">+'+xp+' XP</span>'+
+      '<span class="chip green" style="font-weight:800;font-size:14px;padding:4px 9px">ถูก '+correct+'</span>'+
     '</div>'+
     '<div class="pbar"><i style="width:'+p+'%"></i></div>'+
   '</div>';

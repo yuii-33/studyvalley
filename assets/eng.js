@@ -104,6 +104,7 @@ function guess(ch){
 function win(){
   phase='reveal'; streak++;
   daily = { date:todayStr(), count: daily.count + 1 };
+  if(typeof XP !== 'undefined') XP.award('e:'+cur.w, XP.BASE_ENG);
   save(); render(); speak(cur.w);
 }
 function lose(){ phase='reveal'; streak=0; save(); render(); speak(cur.w); }

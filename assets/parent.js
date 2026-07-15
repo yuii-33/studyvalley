@@ -121,12 +121,15 @@ async function renderReport(){
   const ids = Object.keys(posn);
   let totC=0, totA=0;
   ids.forEach(id=>{ const st=posn[id].stat||{}; totC+=st.correct||0; totA+=st.answered||0; });
-  const XP = totC*10;
+  const xpTotal = (typeof XP!=='undefined') ? XP.total() : totC*10;
+  const lvl = (typeof XP!=='undefined') ? XP.level() : 1;
+  const stk = (typeof XP!=='undefined') ? XP.streak() : 0;
 
   let html = '<div class="ribbon"><span>ภาพรวม</span></div>'
     + '<div class="card prof">'
       + '<div class="profname">'+((profile&&profile.name)||'ยังไม่ตั้งชื่อ')+'</div>'
-      + '<div class="profstat">ตอบถูก '+totC+' / '+totA+' ข้อ • '+XP+' XP • ทำแล้ว '+ids.length+' ชุด</div>'
+      + '<div class="profstat">Lv '+lvl+' • '+xpTotal+' XP'+(stk>1?' • ต่อเนื่อง '+stk+' วัน':'')+'</div>'
+      + '<div class="profstat">ตอบถูก '+totC+' / '+totA+' ข้อ • ทำแล้ว '+ids.length+' ชุด</div>'
     + '</div>';
 
   if(eng){
