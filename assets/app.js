@@ -84,8 +84,8 @@ async function boot(){
   if(!AVATARS.includes(store.art)) store.art = 'cat';   // รูปเก่า (rocket/fox/rabbit) → เริ่มใหม่
   try{ INDEX = await (await fetch('data/posn/index.json', {cache:'no-cache'})).json(); }
   catch(e){ INDEX = null; }        // เปิดแบบ file:// จะโหลดไม่ได้ — คะแนนยังคิดจาก localStorage ได้
-  $('rmA').innerHTML = ART.book(28);
-  $('rmB').innerHTML = ART.rocket(28);
+  $('rmA').innerHTML = '<img src="assets/tiles/openbook.png" width="42" height="42" alt="" style="display:block;border-radius:8px">';
+  $('rmB').innerHTML = '<img src="assets/tiles/rocket.png" width="42" height="42" alt="" style="display:block;border-radius:8px">';
   render();
 }
 
