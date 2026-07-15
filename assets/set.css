@@ -48,6 +48,8 @@
 .pagerbtn:disabled{opacity:.4;cursor:default}
 .pagernow{font-weight:700;font-size:14.5px;color:var(--muted);min-width:78px;text-align:center}
 .picktitle{font-weight:800;font-size:17px;line-height:1.3}
+.newbadge{display:inline-block;vertical-align:middle;font-size:11px;font-weight:800;color:#fff;
+  background:var(--rose-ink);border-radius:7px;padding:1px 7px;box-shadow:0 1px 0 rgba(150,60,60,.3)}
 .pickmeta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 .pickn{font-size:13.5px;color:var(--muted);font-weight:600}
 
@@ -126,6 +128,16 @@
 .exhead svg{flex:0 0 auto}
 .excontent{padding:13px 15px;font-size:16px;line-height:1.65}
 .excontent b{color:var(--ink-hi)}
+
+/* กล่องช่วยในโจทย์/เฉลย (ชุดที่ใช้ .ex-h/.trick/.warn/.step/.ansline/.hl) */
+.qbody .ex-h,.excontent .ex-h{font-weight:800;color:var(--ink-hi);margin:2px 0 6px}
+.qbody .step,.excontent .step{margin:4px 0}
+.qbody .ansline,.excontent .ansline{margin-top:9px;font-weight:800;color:var(--green-ink)}
+.qbody .trick,.excontent .trick{background:var(--gold-pale);border-radius:10px;padding:9px 12px;margin-top:10px;line-height:1.6}
+.qbody .trick .h,.excontent .trick .h{font-weight:800;color:var(--gold-ink)}
+.qbody .warn,.excontent .warn{background:var(--rose);border-radius:10px;padding:9px 12px;margin-top:8px;line-height:1.6}
+.qbody .warn .h,.excontent .warn .h{font-weight:800;color:var(--rose-ink)}
+.qbody .hl td,.excontent .hl td,.qbody td.hl,.excontent td.hl{background:var(--gold-pale)}
 
 /* ── นำทาง ── */
 .nav{display:flex;gap:9px;margin-top:16px}

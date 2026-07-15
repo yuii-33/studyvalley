@@ -1,0 +1,189 @@
+{
+ "id": "260716-com-while",
+ "n": 15,
+ "targetMin": 30,
+ "questions": [
+  {
+   "layer": 1,
+   "q": "code นี้เมื่อจบ ตัวแปร s มีค่าเท่าไร?<pre class=\"code\">s = 0\ni = 1\nwhile i &lt;= 5:\n    s = s + i\n    i = i + 1</pre>",
+   "ch": [
+    "10",
+    "15",
+    "21",
+    "25"
+   ],
+   "c": "15",
+   "ex": "<div class=\"ex-h\">ไล่ตาราง</div><table><tr><th>i</th><th>s</th></tr><tr><td>1</td><td>1</td></tr><tr><td>2</td><td>3</td></tr><tr><td>3</td><td>6</td></tr><tr><td>4</td><td>10</td></tr><tr class=\"hl\"><td>5</td><td>15</td></tr><tr><td>เช็ค 6&gt;5 หยุด</td><td>15</td></tr></table><div class=\"trick\"><span class=\"h\">สังเกต</span> — นี่คือผลรวม 1+2+3+4+5 · ถ้าจำสูตร n(n+1)/2 = 5×6/2 = 15 ได้เลย</div><div class=\"ansline\">ตอบ: s = 15</div>"
+  },
+  {
+   "layer": 1,
+   "q": "ลูปนี้วนกี่รอบ?<pre class=\"code\">i = 10\nc = 0\nwhile i &gt; 0:\n    i = i - 2\n    c = c + 1</pre>",
+   "ch": [
+    "4",
+    "5",
+    "6",
+    "ลูปไม่จบ"
+   ],
+   "c": "5",
+   "ex": "<div class=\"ex-h\">ไล่ตาราง</div><table><tr><th>i</th><th>c</th></tr><tr><td>8</td><td>1</td></tr><tr><td>6</td><td>2</td></tr><tr><td>4</td><td>3</td></tr><tr><td>2</td><td>4</td></tr><tr class=\"hl\"><td>0</td><td>5</td></tr><tr><td>เช็ค 0&gt;0 เท็จ หยุด</td><td>5</td></tr></table><div class=\"ansline\">ตอบ: 5 รอบ</div>"
+  },
+  {
+   "layer": 1,
+   "q": "code นี้คำนวณอะไร และได้เท่าไร?<pre class=\"code\">p = 1\ni = 1\nwhile i &lt;= 4:\n    p = p * i\n    i = i + 1</pre>",
+   "ch": [
+    "10",
+    "24",
+    "12",
+    "16"
+   ],
+   "c": "24",
+   "ex": "<div class=\"ex-h\">ไล่ตาราง</div><table><tr><th>i</th><th>p</th></tr><tr><td>1</td><td>1</td></tr><tr><td>2</td><td>2</td></tr><tr><td>3</td><td>6</td></tr><tr class=\"hl\"><td>4</td><td>24</td></tr><tr><td>เช็ค 5&gt;4 หยุด</td><td>24</td></tr></table><div class=\"trick\"><span class=\"h\">สังเกต</span> — p คูณสะสม = 1×2×3×4 = 4! = 24</div><div class=\"ansline\">ตอบ: 24 (4 แฟกทอเรียล)</div>"
+  },
+  {
+   "layer": 2,
+   "q": "<b>ระวังลำดับ</b> — เพิ่ม i ก่อนบวก · x สุดท้ายเท่าไร?<pre class=\"code\">x = 0\ni = 1\nwhile i &lt;= 5:\n    i = i + 1\n    x = x + i</pre>",
+   "ch": [
+    "15",
+    "20",
+    "21",
+    "14"
+   ],
+   "c": "20",
+   "ex": "<div class=\"ex-h\">ไล่ตาราง (i เพิ่มก่อน x จึงบวกค่าใหม่)</div><table><tr><th>i (หลังเพิ่ม)</th><th>x</th></tr><tr><td>2</td><td>2</td></tr><tr><td>3</td><td>5</td></tr><tr><td>4</td><td>9</td></tr><tr><td>5</td><td>14</td></tr><tr class=\"hl\"><td>6</td><td>20</td></tr><tr><td>เช็ค i=6, 6&gt;5? เช็คก่อนบวก...</td><td>20</td></tr></table><div class=\"warn\"><span class=\"h\">จุดพลาด</span> — เพราะ i=i+1 มาก่อน x จึงบวก 2,3,4,5,6 (ไม่ใช่ 1,2,3,4,5) · ต้องดูลำดับบรรทัดในลูปให้ดี · เช็คเงื่อนไขตอนต้นรอบ: i=6 เข้ารอบสุดท้ายตอน i=5→6 แล้ว x+=6</div><div class=\"ansline\">ตอบ: x = 20</div>"
+  },
+  {
+   "layer": 2,
+   "q": "code นับเลขที่หารด้วย 3 ลงตัวใน 1..10 · c เท่าไร?<pre class=\"code\">c = 0\ni = 1\nwhile i &lt;= 10:\n    if i % 3 == 0:\n        c = c + 1\n    i = i + 1</pre>",
+   "ch": [
+    "2",
+    "3",
+    "4",
+    "5"
+   ],
+   "c": "3",
+   "ex": "<div class=\"ex-h\">ไล่เฉพาะที่เข้าเงื่อนไข</div><div class=\"step\">i % 3 == 0 จริงเมื่อ i = 3, 6, 9 → นับได้ 3 ตัว</div><table><tr><th>i</th><th>i%3==0</th><th>c</th></tr><tr><td>3</td><td>จริง</td><td>1</td></tr><tr><td>6</td><td>จริง</td><td>2</td></tr><tr><td>9</td><td>จริง</td><td>3</td></tr></table><div class=\"ansline\">ตอบ: c = 3</div>"
+  },
+  {
+   "layer": 2,
+   "q": "<b>off-by-one</b> — เริ่มที่ 0 · ลูปวนกี่รอบ?<pre class=\"code\">i = 0\nc = 0\nwhile i &lt; 5:\n    c = c + 1\n    i = i + 1</pre>",
+   "ch": [
+    "4",
+    "5",
+    "6",
+    "ลูปไม่จบ"
+   ],
+   "c": "5",
+   "ex": "<div class=\"ex-h\">ไล่ตาราง</div><table><tr><th>i</th><th>c</th></tr><tr><td>0</td><td>1</td></tr><tr><td>1</td><td>2</td></tr><tr><td>2</td><td>3</td></tr><tr><td>3</td><td>4</td></tr><tr><td>4</td><td>5</td></tr><tr><td>เช็ค 5&lt;5 เท็จ</td><td>หยุด</td></tr></table><div class=\"warn\"><span class=\"h\">จุดพลาด</span> — i &lt; 5 เริ่มที่ 0 → วน i=0,1,2,3,4 = 5 รอบ · ระวังสับสนกับ i &lt;= 5 (จะได้ 6 รอบ)</div><div class=\"ansline\">ตอบ: 5 รอบ</div>"
+  },
+  {
+   "layer": 2,
+   "q": "code นี้มีบั๊กอะไร?<pre class=\"code\">i = 1\ns = 0\nwhile i &lt;= 100:\n    s = s + i</pre>",
+   "ch": [
+    "ผลรวมผิด",
+    "ลูปไม่มีวันจบ",
+    "s เริ่มผิด",
+    "ไม่มีบั๊ก"
+   ],
+   "c": "ลูปไม่มีวันจบ",
+   "ex": "<div class=\"ex-h\">หาบั๊ก</div><div class=\"step\">ในลูปไม่มี i = i + 1 → i ค้างที่ 1 ตลอด → เงื่อนไข 1 ≤ 100 จริงเสมอ → วนไม่จบ</div><div class=\"warn\"><span class=\"h\">จุดพลาด</span> — ทุกลูป while ต้องมีบรรทัดที่ทำให้เงื่อนไข \"เข้าใกล้เท็จ\" ไม่งั้นวนนิรันดร์ · เจอโจทย์หาบั๊ก ให้เช็คก่อนว่าตัวแปรในเงื่อนไขถูกเปลี่ยนไหม</div><div class=\"ansline\">ตอบ: ลูปไม่มีวันจบ (ลืม i = i + 1)</div>"
+  },
+  {
+   "layer": 2,
+   "q": "นับจำนวนหลักของ 1234 · c เท่าไร?<pre class=\"code\">n = 1234\nc = 0\nwhile n &gt; 0:\n    n = n // 10\n    c = c + 1</pre>",
+   "ch": [
+    "3",
+    "4",
+    "5",
+    "ลูปไม่จบ"
+   ],
+   "c": "4",
+   "ex": "<div class=\"ex-h\">ไล่ตาราง</div><table><tr><th>n //10</th><th>c</th></tr><tr><td>123</td><td>1</td></tr><tr><td>12</td><td>2</td></tr><tr><td>1</td><td>3</td></tr><tr class=\"hl\"><td>0</td><td>4</td></tr><tr><td>เช็ค 0&gt;0 เท็จ หยุด</td><td>4</td></tr></table><div class=\"trick\"><span class=\"h\">สังเกต</span> — n // 10 ตัดหลักท้ายทิ้งทีละตัว · นับกี่ครั้งจนเหลือ 0 = จำนวนหลัก</div><div class=\"ansline\">ตอบ: c = 4</div>"
+  },
+  {
+   "layer": 2,
+   "q": "นับเลขที่หารด้วย 6 ลงตัวใน 1..20 · c เท่าไร?<pre class=\"code\">c = 0\ni = 1\nwhile i &lt;= 20:\n    if i % 2 == 0 and i % 3 == 0:\n        c = c + 1\n    i = i + 1</pre>",
+   "ch": [
+    "2",
+    "3",
+    "4",
+    "6"
+   ],
+   "c": "3",
+   "ex": "<div class=\"ex-h\">เงื่อนไขประกอบ and</div><div class=\"step\">i%2==0 <b>และ</b> i%3==0 = หารด้วย 6 ลงตัว → i = 6, 12, 18</div><table><tr><th>i</th><th>%2==0</th><th>%3==0</th><th>c</th></tr><tr><td>6</td><td>จริง</td><td>จริง</td><td>1</td></tr><tr><td>12</td><td>จริง</td><td>จริง</td><td>2</td></tr><tr><td>18</td><td>จริง</td><td>จริง</td><td>3</td></tr></table><div class=\"trick\"><span class=\"h\">สังเกต</span> — หาร 2 และ 3 ลงตัวพร้อมกัน = หาร 6 ลงตัว</div><div class=\"ansline\">ตอบ: c = 3</div>"
+  },
+  {
+   "layer": 2,
+   "q": "ผลรวมเลขคี่ 1..10 · s เท่าไร?<pre class=\"code\">s = 0\ni = 1\nwhile i &lt;= 10:\n    if i % 2 == 1:\n        s = s + i\n    i = i + 1</pre>",
+   "ch": [
+    "20",
+    "25",
+    "30",
+    "24"
+   ],
+   "c": "25",
+   "ex": "<div class=\"ex-h\">บวกเฉพาะเลขคี่</div><div class=\"step\">เลขคี่ใน 1..10 = 1,3,5,7,9 → 1+3+5+7+9 = 25</div><table><tr><th>i (คี่)</th><th>s</th></tr><tr><td>1</td><td>1</td></tr><tr><td>3</td><td>4</td></tr><tr><td>5</td><td>9</td></tr><tr><td>7</td><td>16</td></tr><tr><td>9</td><td>25</td></tr></table><div class=\"ansline\">ตอบ: s = 25</div>"
+  },
+  {
+   "layer": 2,
+   "q": "ลูปนี้วนกี่รอบ (i คูณ 2)?<pre class=\"code\">i = 2\nc = 0\nwhile i &lt;= 32:\n    i = i * 2\n    c = c + 1</pre>",
+   "ch": [
+    "4",
+    "5",
+    "6",
+    "ลูปไม่จบ"
+   ],
+   "c": "5",
+   "ex": "<div class=\"ex-h\">ไล่ตาราง</div><table><tr><th>i×2</th><th>c</th></tr><tr><td>4</td><td>1</td></tr><tr><td>8</td><td>2</td></tr><tr><td>16</td><td>3</td></tr><tr><td>32</td><td>4</td></tr><tr class=\"hl\"><td>64</td><td>5</td></tr><tr><td>เช็ค 64&gt;32 เท็จ หยุด</td><td>5</td></tr></table><div class=\"warn\"><span class=\"h\">จุดพลาด</span> — รอบที่ 5 คูณจนได้ 64 (เกิน 32) แล้วค่อยเช็ค → ยังนับรอบนั้น · เพราะ i*=2 อยู่ก่อนการเช็คเงื่อนไขรอบถัดไป</div><div class=\"ansline\">ตอบ: c = 5</div>"
+  },
+  {
+   "layer": 3,
+   "q": "code นี้เมื่อจบ c เท่าไร?<pre class=\"code\">n = 20\nc = 0\nwhile n &gt; 1:\n    n = n // 2\n    c = c + 1</pre>",
+   "ch": [
+    "3",
+    "4",
+    "5",
+    "6"
+   ],
+   "c": "4",
+   "ex": "<div class=\"ex-h\">วิธีที่ 1 — ไล่ตารางเต็ม (หลักการ ต้องทำได้ก่อน)</div><table><tr><th></th><th>n//2</th><th>n ใหม่</th><th>c</th></tr><tr><td>20//2</td><td>10</td><td>1</td></tr><tr><td>10//2</td><td>5</td><td>2</td></tr><tr><td>5//2</td><td>2</td><td>3</td></tr><tr class=\"hl\"><td>2//2</td><td>1</td><td>4</td></tr><tr><td>1&gt;1 เท็จ หยุด</td><td></td><td>4</td></tr></table><div class=\"trick\"><span class=\"h\">ทางลัด (เมื่อหลักการแม่นแล้ว)</span> — คือ \"หารครึ่งกี่ครั้งจนเหลือ 1\" → 20→10→5→2→1 นับลูกศร = 4 ครั้ง · เขียนแค่แถวลูกศรพอ</div><div class=\"warn\"><span class=\"h\">ระวัง</span> — ทางลัดใช้ได้ก็ต่อเมื่อไล่ตารางเต็มจนแม่นแล้ว · ถ้ายังไม่ชิน<b>อย่าเพิ่งลัด</b> · จุดพลาดยอดฮิตคือลืมนับรอบสุดท้าย (2→1) หรือนับ 1→0 เกินไป</div><div class=\"ansline\">ตอบ: c = 4</div>",
+   "tr": "คิดว่า \"หารครึ่งกี่ครั้งจนเหลือ 1\""
+  },
+  {
+   "layer": 3,
+   "q": "ตัวแปรสองตัวไล่พร้อมกัน · เมื่อจบ a กับ b เท่าไร?<pre class=\"code\">a = 0\nb = 10\nwhile a &lt; b:\n    a = a + 2\n    b = b - 1</pre>",
+   "ch": [
+    "a=6 b=7",
+    "a=8 b=6",
+    "a=8 b=7",
+    "a=6 b=6"
+   ],
+   "c": "a=8 b=6",
+   "ex": "<div class=\"ex-h\">ไล่สองตัวแปรพร้อมกัน</div><table><tr><th></th><th>a</th><th>b</th></tr><tr><td>2</td><td>9</td></tr><tr><td>4</td><td>8</td></tr><tr><td>6</td><td>7</td></tr><tr class=\"hl\"><td>8</td><td>6</td></tr><tr><td>เช็ค 8&lt;6 เท็จ หยุด</td><td></td></tr></table><div class=\"warn\"><span class=\"h\">ระวัง</span> — ต้องอัปเดตทั้ง a และ b ทุกรอบ แล้วเช็คเงื่อนไข a&lt;b ตอนต้นรอบถัดไป · รอบที่ a=8,b=6 แล้ว 8&lt;6 เท็จจึงหยุด · อย่าหยุดเร็วไปตอน a=6,b=7 (6&lt;7 ยังจริง ต้องวนต่อ)</div><div class=\"ansline\">ตอบ: a = 8, b = 6</div>",
+   "tr": "ไล่ทั้ง a และ b พร้อมกันทุกรอบ เช็คเงื่อนไข a<b ตอนต้นรอบ"
+  },
+  {
+   "layer": 3,
+   "q": "if ซ้อนในลูป — นับเลขที่หารทั้ง 2 และ 3 ใน 1..15 · c?<pre class=\"code\">c = 0\ni = 1\nwhile i &lt;= 15:\n    if i % 2 == 0:\n        if i % 3 == 0:\n            c = c + 1\n    i = i + 1</pre>",
+   "ch": [
+    "1",
+    "2",
+    "3",
+    "5"
+   ],
+   "c": "2",
+   "ex": "<div class=\"ex-h\">if ซ้อน = ต้องผ่านทั้งสองชั้น</div><div class=\"step\">ชั้นนอก i%2==0 (เลขคู่) → ชั้นใน i%3==0 · ผ่านทั้งคู่ = หาร 6 ลงตัว ใน 1..15 = 6, 12</div><table><tr><th>i</th><th>ชั้นนอก</th><th>ชั้นใน</th><th>c</th></tr><tr><td>6</td><td>คู่</td><td>หาร3</td><td>1</td></tr><tr><td>12</td><td>คู่</td><td>หาร3</td><td>2</td></tr></table><div class=\"trick\"><span class=\"h\">สังเกต</span> — if ซ้อนสองชั้นแบบนี้เท่ากับ and · แต่ข้อสอบชอบเขียนซ้อนเพื่อให้ไล่ยากขึ้น</div><div class=\"ansline\">ตอบ: c = 2</div>"
+  },
+  {
+   "layer": 3,
+   "q": "ผลรวมกำลังสอง 1..4 · s เท่าไร?<pre class=\"code\">s = 0\ni = 1\nwhile i &lt;= 4:\n    s = s + i * i\n    i = i + 1</pre>",
+   "ch": [
+    "20",
+    "30",
+    "16",
+    "25"
+   ],
+   "c": "30",
+   "ex": "<div class=\"ex-h\">ไล่ตาราง (i×i บวกสะสม)</div><table><tr><th>i</th><th>i×i</th><th>s</th></tr><tr><td>1</td><td>1</td></tr><tr><td>4</td><td>5</td></tr><tr><td>9</td><td>14</td></tr><tr class=\"hl\"><td>16</td><td>30</td></tr><tr><td>เช็ค 5&gt;4 หยุด</td><td>30</td></tr></table><div class=\"trick\"><span class=\"h\">สังเกต</span> — 1²+2²+3²+4² = 1+4+9+16 = 30 · ระวัง i*i คือยกกำลังสอง ไม่ใช่ i×2</div><div class=\"ansline\">ตอบ: s = 30</div>"
+  }
+ ]
+}

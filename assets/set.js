@@ -3,7 +3,15 @@
    โหลดชุดจาก ../data/posn/ · เซฟความคืบหน้า 2 ที่ (localStorage + IndexedDB)
    ══════════════════════════════════════════════════════════ */
 const $ = id => document.getElementById(id);
-const norm = h => String(h == null ? '' : h).replace(/\u00B7/g, '\u2022');  // ตัวคั่นกลาง 00B7 -> bullet 2022 : กฎเหล็ก + กันเพี้ยนเป็น ท
+/* แทนอักขระ Latin-1 ที่ Layiji เรนเดอร์เพี้ยน (บั๊ก 3) ด้วยตัวที่แสดงถูก */
+const norm = h => String(h == null ? '' : h)
+  .replace(/\u00B7/g, '\u2022')          // middle dot -> bullet
+  .replace(/\u00D7/g, '\u2715')          // multiply   -> cross
+  .replace(/\u00F7/g, '/')               // divide     -> slash
+  .replace(/\u00B9/g, '<sup>1</sup>')    // sup 1
+  .replace(/\u00B2/g, '<sup>2</sup>')    // sup 2
+  .replace(/\u00B3/g, '<sup>3</sup>')    // sup 3
+  .replace(/\u00B0/g, '\u02DA');        // degree     -> ring
 const eqAns = (a, b) =>
   String(a).trim().replace(/\s+/g, ' ').toLowerCase() ===
   String(b).trim().replace(/\s+/g, ' ').toLowerCase();
@@ -168,6 +176,9 @@ function renderPicker(index){
   const chips = '<div class="pickfilter">' + filters.map(f =>
     '<button class="lvchip'+(f.k===pickFilter?' on':'')+'" data-f="'+f.k+'">'+f.t+'</button>').join('') + '</div>';
 
+  /* ชุดล่าสุด (วันที่มากสุด) = ป้าย "ใหม่" */
+  const maxDate = (index.sets || []).reduce((m,s)=> (s.date>m ? s.date : m), '');
+
   /* ใหม่บนสุด: เรียงตามวันที่ (มาก→น้อย) แล้ว id */
   let list = (index.sets || []).slice()
     .sort((a,b)=> (b.date>a.date?1 : b.date<a.date?-1 : (b.id>a.id?1:-1)))
@@ -181,10 +192,11 @@ function renderPicker(index){
   const rows = pageItems.map(s => {
     const sj = SUBJ[s.subject] || {t:s.subject,c:'plain'};
     const done = doneCount(s.id, s.n);
+    const isNew = s.date === maxDate && !done;   // ล่าสุด + ยังไม่เริ่ม
     return '<a class="card row pickrow" href="?id=' + s.id + '">'
       + '<div class="tile">' + ART.book(26) + '</div>'
       + '<div style="flex:1;min-width:0">'
-        + '<div class="picktitle">' + s.title + '</div>'
+        + '<div class="picktitle">' + (isNew ? '<span class="newbadge">ใหม่</span> ' : '') + s.title + '</div>'
         + '<div class="pickmeta"><span class="chip ' + sj.c + '">' + sj.t + '</span>'
           + '<span class="pickn">' + s.n + ' ข้อ • เป้า ' + s.targetMin + ' นาที</span></div>'
       + '</div>'

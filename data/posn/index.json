@@ -2,39 +2,30 @@
  "room": "posn-com",
  "sets": [
   {
-   "id": "260712-com-subj",
-   "date": "260712",
-   "subject": "com",
-   "title": "คอม — อัตนัย (เริ่มต้น)",
-   "n": 10,
-   "targetMin": 27,
-   "week": 2
-  },
-  {
-   "id": "260712-mock1",
-   "date": "260712",
-   "subject": "mock",
-   "title": "Mini-Mock #1",
-   "n": 30,
-   "targetMin": 45,
-   "week": 2
-  },
-  {
-   "id": "260714-com-offby",
-   "date": "260714",
-   "subject": "com",
-   "title": "คอม — ไล่โค้ด: กับดัก off-by-one",
+   "id": "260716-math-logic",
+   "date": "260716",
+   "subject": "math",
+   "title": "เลข — ตรรกะ จับโกหก/เรียงลำดับ",
    "n": 15,
-   "targetMin": 40,
+   "targetMin": 30,
    "week": 3
   },
   {
-   "id": "260714-math-mod",
-   "date": "260714",
-   "subject": "math",
-   "title": "เลข — ทฤษฎีจำนวน: วงล้อวัฏจักร",
+   "id": "260716-com-while",
+   "date": "260716",
+   "subject": "com",
+   "title": "คอม — ลูป while เจาะกับดัก",
    "n": 15,
-   "targetMin": 34,
+   "targetMin": 30,
+   "week": 3
+  },
+  {
+   "id": "260715-math-count",
+   "date": "260715",
+   "subject": "math",
+   "title": "เลข — การนับ",
+   "n": 10,
+   "targetMin": 23,
    "week": 3
   },
   {
@@ -47,13 +38,40 @@
    "week": 3
   },
   {
-   "id": "260715-math-count",
-   "date": "260715",
+   "id": "260714-math-mod",
+   "date": "260714",
    "subject": "math",
-   "title": "เลข — การนับ",
-   "n": 10,
-   "targetMin": 23,
+   "title": "เลข — ทฤษฎีจำนวน: วงล้อวัฏจักร",
+   "n": 15,
+   "targetMin": 34,
    "week": 3
+  },
+  {
+   "id": "260714-com-offby",
+   "date": "260714",
+   "subject": "com",
+   "title": "คอม — ไล่โค้ด: กับดัก off-by-one",
+   "n": 15,
+   "targetMin": 40,
+   "week": 3
+  },
+  {
+   "id": "260712-mock1",
+   "date": "260712",
+   "subject": "mock",
+   "title": "Mini-Mock #1",
+   "n": 30,
+   "targetMin": 45,
+   "week": 2
+  },
+  {
+   "id": "260712-com-subj",
+   "date": "260712",
+   "subject": "com",
+   "title": "คอม — อัตนัย (เริ่มต้น)",
+   "n": 10,
+   "targetMin": 27,
+   "week": 2
   }
  ]
 }
