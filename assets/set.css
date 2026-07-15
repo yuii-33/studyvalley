@@ -48,8 +48,6 @@
 .pagerbtn:disabled{opacity:.4;cursor:default}
 .pagernow{font-weight:700;font-size:14.5px;color:var(--muted);min-width:78px;text-align:center}
 .picktitle{font-weight:800;font-size:17px;line-height:1.3}
-.newbadge{display:inline-block;vertical-align:middle;font-size:11px;font-weight:800;color:#fff;
-  background:var(--rose-ink);border-radius:7px;padding:1px 7px;box-shadow:0 1px 0 rgba(150,60,60,.3)}
 .pickmeta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 .pickn{font-size:13.5px;color:var(--muted);font-weight:600}
 

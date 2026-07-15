@@ -8,7 +8,8 @@
    "title": "เลข — ตรรกะ จับโกหก/เรียงลำดับ",
    "n": 15,
    "targetMin": 30,
-   "week": 3
+   "week": 3,
+   "added": 1784144369087
   },
   {
    "id": "260716-com-while",
@@ -17,7 +18,8 @@
    "title": "คอม — ลูป while เจาะกับดัก",
    "n": 15,
    "targetMin": 30,
-   "week": 3
+   "week": 3,
+   "added": 1784144369087
   },
   {
    "id": "260715-math-count",
@@ -73,5 +75,6 @@
    "targetMin": 27,
    "week": 2
   }
- ]
+ ],
+ "newHours": 48
 }

@@ -176,8 +176,8 @@ function renderPicker(index){
   const chips = '<div class="pickfilter">' + filters.map(f =>
     '<button class="lvchip'+(f.k===pickFilter?' on':'')+'" data-f="'+f.k+'">'+f.t+'</button>').join('') + '</div>';
 
-  /* ชุดล่าสุด (วันที่มากสุด) = ป้าย "ใหม่" */
-  const maxDate = (index.sets || []).reduce((m,s)=> (s.date>m ? s.date : m), '');
+  /* ป้าย "new" : เพิ่งเพิ่มภายใน newHours ชั่วโมง (อิงเวลาจริงจาก added) */
+  const newWin = (index.newHours || 48) * 3600000;
 
   /* ใหม่บนสุด: เรียงตามวันที่ (มาก→น้อย) แล้ว id */
   let list = (index.sets || []).slice()
@@ -192,11 +192,11 @@ function renderPicker(index){
   const rows = pageItems.map(s => {
     const sj = SUBJ[s.subject] || {t:s.subject,c:'plain'};
     const done = doneCount(s.id, s.n);
-    const isNew = s.date === maxDate && !done;   // ล่าสุด + ยังไม่เริ่ม
+    const isNew = s.added && (Date.now() - s.added) < newWin && !done;   // เพิ่งเพิ่ม + ยังไม่เริ่ม
     return '<a class="card row pickrow" href="?id=' + s.id + '">'
       + '<div class="tile">' + ART.book(26) + '</div>'
       + '<div style="flex:1;min-width:0">'
-        + '<div class="picktitle">' + (isNew ? '<span class="newbadge">ใหม่</span> ' : '') + s.title + '</div>'
+        + '<div class="picktitle">' + (isNew ? '<span class="newbadge">new</span> ' : '') + s.title + '</div>'
         + '<div class="pickmeta"><span class="chip ' + sj.c + '">' + sj.t + '</span>'
           + '<span class="pickn">' + s.n + ' ข้อ • เป้า ' + s.targetMin + ' นาที</span></div>'
       + '</div>'

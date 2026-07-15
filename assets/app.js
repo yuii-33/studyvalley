@@ -173,6 +173,9 @@ function render(){
 
   /* การ์ดห้องเรียน สอวน. */
   const nSets = INDEX ? INDEX.sets.length : null;
+  const newWin = ((INDEX && INDEX.newHours) || 48) * 3600000;
+  const anyNew = !!(INDEX && INDEX.sets.some(s => s.added && Date.now()-s.added < newWin));
+  $('rmAnew').style.display = anyNew ? '' : 'none';
   $('rmAsub').textContent = 'เลข + คอม' + (nSets ? ' • '+nSets+' ชุด' : '');
   $('rmAchips').innerHTML = attempted
     ? '<span class="chip green">ทำแล้ว '+attempted+(nSets?' / '+nSets:'')+' ชุด</span>'
