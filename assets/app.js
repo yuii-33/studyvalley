@@ -1,5 +1,6 @@
 /* ═══ หน้าแรก — โปรไฟล์เดียวต่อเครื่อง + คะแนนจริงจากผลทำโจทย์ ═══ */
-const AVATARS = ['apple','rocket','sprout','cat','fox','mushroom','star','rabbit','cactus'];
+const AVATARS = ['cat','dog','turtle','bird','apple','mushroom','sprout','cactus','sun','moon','star','cloud','boy','girl'];
+const avImg = (name, size) => '<img src="assets/avatars/'+name+'.png" width="'+size+'" height="'+size+'" alt="" style="display:block;border-radius:8px">';
 
 /* ค่าเริ่มต้น — ถูกทับด้วยข้อมูลที่เซฟไว้ในเครื่อง (ถ้ามี) */
 const store = {
@@ -80,6 +81,7 @@ function readScores(){
 async function boot(){
   const saved = await idbGet(KEY) || loadLocal();
   if(validHome(saved)){ store.name = saved.profile.name; store.art = saved.profile.art; store.goals = saved.profile.goals; save(); }
+  if(!AVATARS.includes(store.art)) store.art = 'cat';   // รูปเก่า (rocket/fox/rabbit) → เริ่มใหม่
   try{ INDEX = await (await fetch('data/posn/index.json', {cache:'no-cache'})).json(); }
   catch(e){ INDEX = null; }        // เปิดแบบ file:// จะโหลดไม่ได้ — คะแนนยังคิดจาก localStorage ได้
   $('rmA').innerHTML = ART.book(28);
@@ -97,8 +99,8 @@ function render(){
 
   /* โปรไฟล์ */
   $('nm').value = store.name;
-  $('av').innerHTML = ART[store.art](38);
-  $('heroPin').innerHTML = ART[store.art](18);
+  $('av').innerHTML = avImg(store.art, 52);
+  $('heroPin').innerHTML = avImg(store.art, 22);
 
   /* เลเวล */
   $('lv').textContent = 'Lv '+level;
@@ -113,9 +115,9 @@ function render(){
   $('emo').innerHTML = '';
   AVATARS.forEach(a=>{
     const b = document.createElement('button');
-    b.innerHTML = ART[a](28);
-    b.style.cssText = 'width:46px;height:46px;border:0;border-radius:12px;cursor:pointer;'+
-      'display:flex;align-items:center;justify-content:center;'+
+    b.innerHTML = avImg(a, 40);
+    b.style.cssText = 'width:48px;height:48px;border:0;border-radius:12px;cursor:pointer;'+
+      'display:flex;align-items:center;justify-content:center;overflow:hidden;'+
       (a===store.art ? 'background:var(--gold);box-shadow:0 0 0 2px var(--gold-d)'
                      : 'background:#F5EAD2;box-shadow:0 0 0 1.5px var(--line)');
     b.onclick = ()=>{ store.art = a; save(); render(); };
@@ -241,6 +243,7 @@ $('restoreBtn').onclick = ()=>{
   if(restoreArmed && pendingRestore){
     const d = pendingRestore;
     store.name = d.profile.name; store.art = d.profile.art; store.goals = d.profile.goals;
+    if(!AVATARS.includes(store.art)) store.art = 'cat';
     if(d.posn && typeof d.posn === 'object'){
       Object.keys(d.posn).forEach(k=>{
         if(k.indexOf('sv.posn.') === 0){ try{ localStorage.setItem(k, JSON.stringify(d.posn[k])); idbPut(k, d.posn[k]); }catch(e){} }
