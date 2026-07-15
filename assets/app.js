@@ -1,5 +1,5 @@
 /* ═══ หน้าแรก — โปรไฟล์เดียวต่อเครื่อง + คะแนนจริงจากผลทำโจทย์ ═══ */
-const AVATARS = ['cat','dog','turtle','bird','apple','mushroom','sprout','cactus','sun','moon','star','cloud','boy','girl'];
+const AVATARS = ['cat','dog','turtle','bird','apple','mushroom','cactus','sun','moon','star','cloud','boy','girl'];
 const avImg = (name, size) => '<img src="assets/avatars/'+name+'.png" width="'+size+'" height="'+size+'" alt="" style="display:block;border-radius:8px">';
 
 /* ค่าเริ่มต้น — ถูกทับด้วยข้อมูลที่เซฟไว้ในเครื่อง (ถ้ามี) */
@@ -147,7 +147,7 @@ function render(){
     el.style.borderRadius = '15px';
     el.innerHTML =
       '<div class="tile" style="width:42px;height:42px;flex:0 0 42px">'+
-        ART[g.kind==='exam'?'flag':'leaf'](26)+'</div>'+
+        '<img src="assets/tiles/'+(g.kind==='exam'?'flag':'sprout')+'.png" width="38" height="38" alt="" style="display:block;border-radius:8px">'+'</div>'+
       '<div style="flex:1;min-width:0">'+
         '<div style="font-weight:700;font-size:17.5px;line-height:1.3">'+g.title+'</div>'+
         (sub?'<div style="font-size:14px;color:var(--muted);margin-top:1px">'+sub+'</div>':'')+
