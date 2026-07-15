@@ -32,7 +32,8 @@ function computeStat(){
   });
   return { n:SET.n, answered, correct, done };
 }
-const snapshot = () => ({ v:SCHEMA, id:SET.id, n:SET.n, cur, ans, elapsed, stat:computeStat() });
+const snapshot = () => ({ v:SCHEMA, id:SET.id, n:SET.n, cur, ans, elapsed, stat:computeStat(), t:Date.now() });
+const EXPIRE = 18*3600*1000;   // ค้างเกิน 18 ชม. = ล้าง ทำใหม่
 function validSaved(d){
   return d && d.v === SCHEMA && d.id === SET.id && d.n === SET.n
       && Array.isArray(d.ans) && d.ans.length === SET.n;   // จำนวนข้อต้องตรง
@@ -73,8 +74,8 @@ function save(){
   saveTimer = setTimeout(() => idbSave(keyOf(SET.id), d), 300);
 }
 
-/* ── จับเวลา : นับขึ้น · หยุดเมื่อสลับแอป · กันเวลากระโดด ── */
-let elapsed = 0, running = false, lastTick = 0, timerH = null;
+/* ── จับเวลา : นับขึ้น · พักตอนเฉลย/พักเบรค · หยุดเมื่อสลับแอป · กันเวลากระโดด ── */
+let elapsed = 0, running = false, lastTick = 0, timerH = null, manualPaused = false;
 const mmss = s => Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
 function renderTimer(){
   const t = $('timer');
@@ -93,11 +94,18 @@ function tick(){
   elapsed += 1; renderTimer();
   if(elapsed % 5 === 0) save();
 }
-document.addEventListener('visibilitychange', () => { document.hidden ? stopTimer() : resumeIfQuiz(); });
+document.addEventListener('visibilitychange', () => { document.hidden ? stopTimer() : syncTimer(); });
 window.addEventListener('pagehide', stopTimer);
 window.addEventListener('blur', stopTimer);
-window.addEventListener('focus', resumeIfQuiz);
-function resumeIfQuiz(){ if($('quiz').style.display !== 'none' && $('summary').style.display === 'none') startTimer(); }
+window.addEventListener('focus', syncTimer);
+/* เดินเวลาเฉพาะตอน: อยู่ในโหมดทำโจทย์ · ข้อยังไม่เฉลย · ไม่พักเบรค · ไม่สลับแอป */
+function timerShouldRun(){
+  return SET && $('quiz').style.display !== 'none' && $('summary').style.display === 'none'
+      && !document.hidden && !manualPaused && ans[cur] && !ans[cur].revealed;
+}
+function syncTimer(){ if(timerShouldRun()) startTimer(); else stopTimer(); }
+function pauseBreak(){ manualPaused = true; syncTimer(); $('pauseCover').style.display = 'flex'; save(); }
+function resumeBreak(){ manualPaused = false; $('pauseCover').style.display = 'none'; syncTimer(); }
 
 /* ── โหลดข้อมูล ── */
 async function loadJSON(path){
@@ -128,15 +136,18 @@ async function boot(){
   cur = 0; elapsed = 0;
 
   const saved = await idbLoad(keyOf(id)) || loadLocal(id);
-  if(validSaved(saved)){ ans = saved.ans; cur = Math.min(saved.cur||0, SET.n-1); elapsed = saved.elapsed||0; }
+  if(validSaved(saved) && (Date.now() - (saved.t||0)) <= EXPIRE){
+    ans = saved.ans; cur = Math.min(saved.cur||0, SET.n-1); elapsed = saved.elapsed||0;   // ทำต่อจากเดิม
+  } else if(saved){
+    try{ localStorage.removeItem(keyOf(id)); }catch(e){}   // ค้างข้ามวัน/เกิน 18 ชม. → ล้าง เริ่มใหม่
+  }
 
   $('settitle').textContent = META ? META.title : id;
   $('timer').style.display = '';
   $('picker').style.display = 'none';
   $('quiz').style.display = '';
   bindActions();
-  renderQuestion();
-  startTimer();
+  renderQuestion();   // renderQuestion เรียก syncTimer เอง
 }
 
 function fail(msg){
@@ -262,9 +273,11 @@ function renderQuestion(){
   $('btnReveal').style.display = a.revealed ? 'none' : '';
   $('btnClear').style.display  = a.revealed ? 'none' : '';
   $('btnDontknow').style.display = a.revealed ? 'none' : '';
+  $('pauseBtn').style.display = a.revealed ? 'none' : '';   // พักเบรคได้เฉพาะตอนยังไม่เฉลย
   $('btnPrev').disabled = cur === 0;
   $('btnNext').textContent = cur === SET.n-1 ? 'ดูสรุปผล' : 'ถัดไป';
 
+  syncTimer();          // เฉลย → พัก · ข้อใหม่ (play) → จับต่อออโต้
   window.scrollTo(0, 0);
 }
 
@@ -287,6 +300,8 @@ function bindActions(){
     if(cur === SET.n-1){ showSummary(); return; }
     cur++; save(); renderQuestion();
   };
+  $('pauseBtn').onclick = pauseBreak;
+  $('resumeBtn').onclick = resumeBreak;
 }
 function toggleConf(v){
   const a = ans[cur];

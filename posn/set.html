@@ -33,7 +33,11 @@
   <div id="quiz" style="display:none">
 
     <div class="qprog"><i id="qprogfill"></i></div>
-    <div class="qmeta"><span id="qcount"></span><span id="qtarget"></span></div>
+    <div class="qmeta">
+      <span id="qcount"></span>
+      <button class="pausebtn" id="pauseBtn">พักเบรคชั่วคราว</button>
+      <span id="qtarget"></span>
+    </div>
 
     <div class="card qcard">
       <div class="badges" id="badges"></div>
@@ -76,6 +80,14 @@
   <div id="summary" style="display:none"></div>
 
 </div>
+</div>
+
+<div class="pausecover" id="pauseCover" style="display:none">
+  <div class="pausebox">
+    <div class="pausemsg">พักเบรคอยู่ • เวลาไม่เดิน</div>
+    <button class="btn primary" id="resumeBtn">ทำต่อ</button>
+    <a class="btn soft" href="../index.html" id="pauseHome">ออกไปหน้าแรก</a>
+  </div>
 </div>
 <script src="../assets/art.js"></script>
 <script src="../assets/xp.js"></script>
