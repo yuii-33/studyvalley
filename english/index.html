@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!-- ══════════════════════════════════════════════════════════
+     english/index.html — เกมเก็บศัพท์ (กู้ภัยจรวด)
+     ทายตัวอักษรให้ครบก่อนจรวดพัง · อ่านคำจาก ../data/english/words.json
+     ══════════════════════════════════════════════════════════ -->
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>เก็บศัพท์ • Study Valley</title>
+<meta name="theme-color" content="#F1D486">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Study Valley">
+<link rel="stylesheet" href="../assets/app.css">
+<link rel="stylesheet" href="../assets/eng.css">
+</head>
+<body>
+<div class="wrap">
+<div class="panel">
+
+  <div class="setbar">
+    <a class="backlink" id="homelink" href="../index.html">หน้าแรก</a>
+    <div class="settitle">เก็บศัพท์</div>
+    <div class="streak" id="streak" style="display:none"></div>
+  </div>
+
+  <div class="lvchips" id="lvchips"></div>
+
+  <div class="card daily">
+    <div class="dailytop">
+      <div>วันนี้เก็บได้ <b id="dailyN">0</b> / <span id="dailyGoal">5</span> คำ</div>
+      <div class="dailydone" id="dailyDone" style="display:none">ครบเป้าแล้ว</div>
+    </div>
+    <div class="pbar"><i id="dailyfill" style="width:0%"></i></div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="slots" id="slots"></div>
+  <div class="hinttext" id="hinttext"></div>
+  <button class="speakbtn" id="speakBtn" style="display:none"></button>
+
+  <div class="keyboard" id="keyboard"></div>
+
+  <div class="engnav" id="engnav" style="display:none">
+    <button class="btn primary" id="nextBtn">คำถัดไป</button>
+  </div>
+
+</div>
+</div>
+<script src="../assets/art.js"></script>
+<script src="../assets/eng.js"></script>
+</body>
+</html>
