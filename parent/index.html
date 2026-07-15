@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!-- ══════════════════════════════════════════════════════════
+     parent/index.html — หน้าผู้ปกครองดูผล (PIN 4 หลัก)
+     PIN เป็นด่านอ่อน ๆ เก็บในเครื่อง (ไม่ใช่ระบบล็อกอินจริง)
+     ══════════════════════════════════════════════════════════ -->
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ผลการเรียน • Study Valley</title>
+<meta name="theme-color" content="#F1D486">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study Valley">
+<link rel="stylesheet" href="../assets/app.css">
+<link rel="stylesheet" href="../assets/parent.css">
+</head>
+<body>
+<div class="wrap">
+<div class="panel">
+
+  <div class="setbar">
+    <a class="backlink" id="homelink" href="../index.html">หน้าแรก</a>
+    <div class="settitle">ผลการเรียน</div>
+    <div class="lockbtn" id="lockBtn" style="display:none">ล็อก</div>
+  </div>
+
+  <!-- ล็อก : ใส่ PIN -->
+  <div id="lock">
+    <div class="lockhint" id="lockHint">ใส่ PIN 4 หลัก</div>
+    <div class="dots" id="dots"></div>
+    <div class="lockmsg" id="lockMsg"></div>
+    <div class="pinpad" id="pinpad"></div>
+    <button class="resetpin" id="resetPin" style="display:none">ลืม PIN — ตั้งใหม่ (ล้างของเดิม)</button>
+  </div>
+
+  <!-- รายงาน -->
+  <div id="report" style="display:none"></div>
+
+</div>
+</div>
+<script src="../assets/art.js"></script>
+<script src="../assets/parent.js"></script>
+</body>
+</html>

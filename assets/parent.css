@@ -1,0 +1,45 @@
+/* ═══════════════════════════════════════════
+   assets/parent.css — หน้าผู้ปกครอง (โหลดคู่กับ app.css)
+   ═══════════════════════════════════════════ */
+.setbar{display:flex;align-items:center;gap:10px;margin:2px 2px 14px}
+.backlink{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;font-weight:700;font-size:14.5px;
+  color:var(--wood-l);background:var(--tan);padding:6px 12px 6px 9px;border-radius:20px;box-shadow:0 2px 0 rgba(150,100,40,.12)}
+.backlink svg{width:17px;height:17px}
+.settitle{flex:1;min-width:0;font-weight:800;font-size:17px;color:var(--ink-hi);text-align:center}
+.lockbtn{flex:0 0 auto;font-weight:700;font-size:14px;color:var(--wood-l);background:var(--tan);
+  padding:6px 13px;border-radius:20px;cursor:pointer;box-shadow:0 2px 0 rgba(150,100,40,.12)}
+
+/* ── ล็อก ── */
+.lockhint{text-align:center;font-weight:700;font-size:17px;color:var(--ink-hi);margin:24px 0 16px}
+.dots{display:flex;gap:16px;justify-content:center;margin-bottom:10px}
+.dot{width:16px;height:16px;border-radius:50%;background:transparent;box-shadow:inset 0 0 0 2.5px var(--gold-d)}
+.dot.on{background:var(--gold-d)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.dots.shake{animation:shake .35s}
+.lockmsg{text-align:center;min-height:22px;color:var(--rose-ink);font-weight:700;font-size:14.5px;margin-bottom:6px}
+.pinpad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:290px;margin:0 auto}
+.pinkey{height:62px;border:0;border-radius:16px;background:var(--card);color:var(--ink-hi);font-weight:800;
+  font-size:24px;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+.pinkey:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.pinkey[data-k="del"]{font-size:16px;background:var(--tan);color:var(--tan-ink)}
+.resetpin{display:block;margin:20px auto 0;border:0;background:transparent;color:var(--dim);
+  font-weight:600;font-size:13.5px;cursor:pointer;padding:6px}
+
+/* ── รายงาน ── */
+.prof{text-align:center;padding:16px}
+.profname{font-size:23px;font-weight:800;color:var(--ink-hi)}
+.profstat{font-size:14.5px;color:var(--muted);font-weight:700;margin-top:3px}
+.engrow{padding:12px 14px;font-size:15px;color:var(--ink)}
+.engrow b{color:var(--green-ink)}
+.setrow{padding:11px 14px;margin-bottom:8px}
+.setstat{font-weight:700;font-size:15px;color:var(--ink)}
+.pcard{display:flex;align-items:flex-start;gap:11px;background:var(--card);border:2px solid var(--line-2);
+  border-radius:13px;padding:11px 12px;box-shadow:var(--lift-1);margin-bottom:8px}
+.pcard.wrongSure{border-color:var(--rose-ring)}
+.pcard.rightUnsure{border-color:var(--gold-ring)}
+.pcard.dk{border-color:var(--blue-ring)}
+.pcard.miss{border-color:var(--line)}
+.ptitle{font-weight:800;font-size:15.5px;color:var(--ink-hi);line-height:1.35}
+.ptodo{font-size:14px;color:var(--muted);margin-top:2px}
+.allok{text-align:center;color:var(--green-ink);font-weight:700;font-size:14.5px;
+  background:var(--green-pale);border-radius:12px;padding:10px;margin-bottom:8px}

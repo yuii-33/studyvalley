@@ -146,11 +146,19 @@ function fail(msg){
 
 /* ── รายการชุด (เมื่อไม่มี ?id) ── */
 const SUBJ = { math:{t:'เลข',c:'gold'}, com:{t:'คอม',c:'green'}, mock:{t:'ประเมิน',c:'plum'} };
+let INDEX_CACHE = null, pickFilter = 'all';
 function renderPicker(index){
+  INDEX_CACHE = index;
   $('settitle').textContent = 'เลือกชุดทำโจทย์';
   const box = $('picker');
   box.style.display = '';
-  const rows = (index.sets || []).map(s => {
+
+  const filters = [{k:'all',t:'ทั้งหมด'},{k:'math',t:'เลข'},{k:'com',t:'คอม'},{k:'mock',t:'ประเมิน'}];
+  const chips = '<div class="pickfilter">' + filters.map(f =>
+    '<button class="lvchip'+(f.k===pickFilter?' on':'')+'" data-f="'+f.k+'">'+f.t+'</button>').join('') + '</div>';
+
+  const list = (index.sets || []).filter(s => pickFilter==='all' || s.subject===pickFilter);
+  const rows = list.map(s => {
     const sj = SUBJ[s.subject] || {t:s.subject,c:'plain'};
     const done = doneCount(s.id, s.n);
     return '<a class="card row pickrow" href="?id=' + s.id + '">'
@@ -163,7 +171,10 @@ function renderPicker(index){
       + (done ? '<span class="chip green">ทำแล้ว ' + done + '/' + s.n + '</span>' : '')
       + '</a>';
   }).join('');
-  box.innerHTML = '<div class="stack">' + rows + '</div>';
+  box.innerHTML = chips + '<div class="stack">' + (rows || '<div class="empty">ยังไม่มีชุดในหมวดนี้</div>') + '</div>';
+  box.querySelectorAll('[data-f]').forEach(b=>{
+    b.onclick = ()=>{ pickFilter = b.dataset.f; renderPicker(INDEX_CACHE); };
+  });
 }
 function doneCount(id, n){
   const d = loadLocal(id);
