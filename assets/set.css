@@ -41,6 +41,12 @@
   background:var(--tan);color:var(--tan-ink);box-shadow:0 2px 0 rgba(150,100,40,.12)}
 .lvchip.on{background:var(--gold);color:var(--wood);box-shadow:0 0 0 2px var(--gold-d)}
 .pickrow{align-items:center}
+.pager{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px}
+.pagerbtn{border:0;cursor:pointer;font-weight:800;font-size:15px;color:var(--wood-l);
+  background:var(--tan);min-width:40px;height:40px;border-radius:12px;box-shadow:0 2px 0 rgba(150,100,40,.12)}
+.pagerbtn:active{transform:translateY(1px)}
+.pagerbtn:disabled{opacity:.4;cursor:default}
+.pagernow{font-weight:700;font-size:14.5px;color:var(--muted);min-width:78px;text-align:center}
 .picktitle{font-weight:800;font-size:17px;line-height:1.3}
 .pickmeta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 .pickn{font-size:13.5px;color:var(--muted);font-weight:600}

@@ -154,9 +154,10 @@ function fail(msg){
   $('picker').innerHTML = '<div class="empty">' + msg + '</div>';
 }
 
-/* ── รายการชุด (เมื่อไม่มี ?id) ── */
+/* ── รายการชุด (เมื่อไม่มี ?id) : ใหม่บนสุด · แบ่งหน้า ── */
 const SUBJ = { math:{t:'เลข',c:'gold'}, com:{t:'คอม',c:'green'}, mock:{t:'ประเมิน',c:'plum'} };
-let INDEX_CACHE = null, pickFilter = 'all';
+const PAGE_SIZE = 6;
+let INDEX_CACHE = null, pickFilter = 'all', pickPage = 0;
 function renderPicker(index){
   INDEX_CACHE = index;
   $('settitle').textContent = 'เลือกชุดทำโจทย์';
@@ -167,8 +168,17 @@ function renderPicker(index){
   const chips = '<div class="pickfilter">' + filters.map(f =>
     '<button class="lvchip'+(f.k===pickFilter?' on':'')+'" data-f="'+f.k+'">'+f.t+'</button>').join('') + '</div>';
 
-  const list = (index.sets || []).filter(s => pickFilter==='all' || s.subject===pickFilter);
-  const rows = list.map(s => {
+  /* ใหม่บนสุด: เรียงตามวันที่ (มาก→น้อย) แล้ว id */
+  let list = (index.sets || []).slice()
+    .sort((a,b)=> (b.date>a.date?1 : b.date<a.date?-1 : (b.id>a.id?1:-1)))
+    .filter(s => pickFilter==='all' || s.subject===pickFilter);
+
+  const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  if(pickPage >= pages) pickPage = pages - 1;
+  if(pickPage < 0) pickPage = 0;
+  const pageItems = list.slice(pickPage*PAGE_SIZE, (pickPage+1)*PAGE_SIZE);
+
+  const rows = pageItems.map(s => {
     const sj = SUBJ[s.subject] || {t:s.subject,c:'plain'};
     const done = doneCount(s.id, s.n);
     return '<a class="card row pickrow" href="?id=' + s.id + '">'
@@ -181,9 +191,27 @@ function renderPicker(index){
       + (done ? '<span class="chip green">ทำแล้ว ' + done + '/' + s.n + '</span>' : '')
       + '</a>';
   }).join('');
-  box.innerHTML = chips + '<div class="stack">' + (rows || '<div class="empty">ยังไม่มีชุดในหมวดนี้</div>') + '</div>';
+
+  let pager = '';
+  if(pages > 1){
+    const b = (p, label, on) => '<button class="pagerbtn" data-p="'+p+'"'+(on?'':' disabled')+'>'+label+'</button>';
+    const atFirst = pickPage===0, atLast = pickPage===pages-1;
+    pager = '<div class="pager">'
+      + b('first','&lt;&lt;', !atFirst) + b('prev','&lt;', !atFirst)
+      + '<span class="pagernow">หน้า ' + (pickPage+1) + ' / ' + pages + '</span>'
+      + b('next','&gt;', !atLast) + b('last','&gt;&gt;', !atLast)
+      + '</div>';
+  }
+
+  box.innerHTML = chips + '<div class="stack">' + (rows || '<div class="empty">ยังไม่มีชุดในหมวดนี้</div>') + '</div>' + pager;
   box.querySelectorAll('[data-f]').forEach(b=>{
-    b.onclick = ()=>{ pickFilter = b.dataset.f; renderPicker(INDEX_CACHE); };
+    b.onclick = ()=>{ pickFilter = b.dataset.f; pickPage = 0; renderPicker(INDEX_CACHE); };
+  });
+  box.querySelectorAll('[data-p]').forEach(b=>{
+    b.onclick = ()=>{ const p=b.dataset.p;
+      pickPage = p==='first' ? 0 : p==='last' ? pages-1 : p==='prev' ? pickPage-1 : pickPage+1;
+      renderPicker(INDEX_CACHE); window.scrollTo(0,0);
+    };
   });
 }
 function doneCount(id, n){

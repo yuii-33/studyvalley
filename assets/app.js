@@ -171,8 +171,6 @@ function render(){
     G.appendChild(el);
   });
 
-  renderWeeks(scores);
-
   /* การ์ดห้องเรียน สอวน. */
   const nSets = INDEX ? INDEX.sets.length : null;
   $('rmAsub').textContent = 'เลข + คอม' + (nSets ? ' • '+nSets+' ชุด' : '');
@@ -182,45 +180,6 @@ function render(){
     : '<span class="chip plain">ยังไม่เริ่ม</span>';
 }
 
-/* ── หมุดหมายความคืบหน้า — จากผลจริง จัดกลุ่มตามสัปดาห์ ── */
-function renderWeeks(scores){
-  const box = $('weeks');
-  if(!INDEX){
-    const ids = Object.keys(scores);
-    if(!ids.length){ box.innerHTML = '<div class="empty">ยังไม่มีผลทำโจทย์ — เริ่มที่ห้องเรียนด้านล่าง</div>'; return; }
-    let correct = 0, done = 0;
-    ids.forEach(id=>{ correct += scores[id].correct||0; done += (scores[id].done>0?1:0); });
-    box.innerHTML = weekCard('ผลรวม', 'chest', done, ids.length, correct, ids.length?Math.round(done/ids.length*100):0);
-    return;
-  }
-  const W = {}, order = [];
-  INDEX.sets.forEach(s=>{
-    const wk = s.week || 0;
-    if(!W[wk]){ W[wk] = {sets:0, done:0, correct:0}; order.push(wk); }
-    W[wk].sets++;
-    const st = scores[s.id];
-    if(st){ W[wk].correct += st.correct||0; if((st.done||0) >= s.n) W[wk].done++; }
-  });
-  const arts = ['castle','tree','chest','flag','leaf'];
-  order.sort((a,b)=>a-b);
-  box.innerHTML = order.map((wk,i)=>{
-    const w = W[wk], p = w.sets ? Math.round(w.done/w.sets*100) : 0;
-    return weekCard('สัปดาห์ '+wk, arts[i%arts.length], w.done, w.sets, w.correct, p);
-  }).join('');
-}
-function weekCard(label, art, done, total, correct, p){
-  return '<div class="card" style="flex:1;min-width:210px">'+
-    '<div class="row">'+
-      '<div class="tile">'+ART[art](28)+'</div>'+
-      '<div style="flex:1;min-width:0">'+
-        '<div style="font-weight:600;font-size:14px;color:var(--dim)">'+label+'</div>'+
-        '<div style="font-weight:800;font-size:17.5px">ทำได้ '+done+'/'+total+' ชุด</div>'+
-      '</div>'+
-      '<span class="chip green" style="font-weight:800;font-size:14px;padding:4px 9px">ถูก '+correct+'</span>'+
-    '</div>'+
-    '<div class="pbar"><i style="width:'+p+'%"></i></div>'+
-  '</div>';
-}
 
 /* ── ฟอร์ม / ปุ่ม ── */
 $('avBtn').onclick = ()=>{ const p=$('avPick'); p.style.display = p.style.display==='none' ? '' : 'none'; };
