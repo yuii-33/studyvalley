@@ -16,6 +16,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Study Valley</title>
+<meta name="theme-color" content="#F1D486">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Study Valley">
 <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
@@ -27,9 +33,6 @@
     <h1>Study Valley</h1>
     <div class="spark" style="background:var(--green-ring);animation-delay:.6s"></div>
   </div>
-
-  <!-- สลับคน -->
-  <div class="grid" style="justify-content:center;gap:8px;margin-bottom:14px" id="who"></div>
 
   <!-- การ์ดโปรไฟล์ -->
   <div class="card row">
@@ -89,10 +92,8 @@
       <div class="tile" id="rmA"></div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:800;font-size:18px">สอวน. คอมพิวเตอร์</div>
-        <div style="font-size:14px;color:var(--muted);margin:1px 0 5px">เลข + คอม • 29 ชุด</div>
-        <div class="grid" style="gap:5px">
-          <span class="chip green">ทำแล้ว 21</span><span class="chip gold">72%</span>
-        </div>
+        <div style="font-size:14px;color:var(--muted);margin:1px 0 5px" id="rmAsub">เลข + คอม</div>
+        <div class="grid" style="gap:5px" id="rmAchips"></div>
       </div>
     </a>
     <a class="card row" href="english/" style="flex:1;min-width:220px">

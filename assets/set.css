@@ -4,8 +4,10 @@
 
 /* ── แถบบน ── */
 .setbar{display:flex;align-items:center;gap:10px;margin:2px 2px 12px}
-.backlink{flex:0 0 auto;font-weight:700;font-size:14.5px;color:var(--wood-l);
-  background:var(--tan);padding:6px 13px;border-radius:20px;box-shadow:0 2px 0 rgba(150,100,40,.12)}
+.backlink{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;
+  font-weight:700;font-size:14.5px;color:var(--wood-l);
+  background:var(--tan);padding:6px 12px 6px 9px;border-radius:20px;box-shadow:0 2px 0 rgba(150,100,40,.12)}
+.backlink svg{width:17px;height:17px}
 .settitle{flex:1;min-width:0;font-weight:800;font-size:17px;color:var(--ink-hi);
   text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .timer{flex:0 0 auto;font-weight:800;font-size:16px;color:var(--wood);

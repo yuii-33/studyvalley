@@ -136,4 +136,9 @@ const ART = {
   grid: s => svg(`
     <rect x="12" y="14" width="40" height="36" rx="4" fill="${C.cream}" stroke="${C.line}"/>
     <path d="M12 26h40M12 38h40M26 14v36M39 14v36" stroke="${C.wood_d}" stroke-width="2"/>`, s),
+
+  home: s => svg(`
+    <path d="M32 12 54 30v22a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V30z" fill="${C.gold}" stroke="${C.gold_x}"/>
+    <path d="M8 32 32 13 56 32" stroke="${C.wood_d}" stroke-width="3"/>
+    <path d="M26 54V38h12v16z" fill="${C.wood}"/>`, s),
 };

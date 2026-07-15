@@ -23,7 +23,16 @@ let cur = 0;           // ข้อปัจจุบัน (0-based)
 const SCHEMA = 1;
 const keyOf = id => 'sv.posn.' + id;
 
-const snapshot = () => ({ v:SCHEMA, id:SET.id, n:SET.n, cur, ans, elapsed });
+function computeStat(){
+  let answered = 0, correct = 0, done = 0;
+  SET.questions.forEach((q, i) => {
+    const a = ans[i];
+    if(a.dk){ done++; return; }
+    if(a.revealed){ done++; answered++; if(a.pick != null && eqAns(a.pick, q.c)) correct++; }
+  });
+  return { n:SET.n, answered, correct, done };
+}
+const snapshot = () => ({ v:SCHEMA, id:SET.id, n:SET.n, cur, ans, elapsed, stat:computeStat() });
 function validSaved(d){
   return d && d.v === SCHEMA && d.id === SET.id && d.n === SET.n
       && Array.isArray(d.ans) && d.ans.length === SET.n;   // จำนวนข้อต้องตรง
@@ -98,6 +107,7 @@ async function loadJSON(path){
 }
 
 async function boot(){
+  const hl = $('homelink'); if(hl) hl.innerHTML = ART.home(17) + '<span>หน้าแรก</span>';
   const id = new URLSearchParams(location.search).get('id');
   let index;
   try{ index = await loadJSON('../data/posn/index.json'); }
