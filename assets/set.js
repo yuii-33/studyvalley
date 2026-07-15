@@ -16,7 +16,7 @@ const LAYER = {
 
 let SET = null;        // ข้อมูลชุด { id, n, targetMin, questions:[...] }
 let META = null;       // แถวจาก index.json ของชุดนี้
-let ans = [];          // สถานะต่อข้อ { pick, conf, revealed, dk }
+let ans = [];          // สถานะต่อข้อ { pick, revealed }
 let cur = 0;           // ข้อปัจจุบัน (0-based)
 
 /* ── เซฟ 2 ที่ : localStorage + IndexedDB (ตรวจ schema + จำนวนข้อ ก่อนใช้) ── */
@@ -27,7 +27,6 @@ function computeStat(){
   let answered = 0, correct = 0, done = 0;
   SET.questions.forEach((q, i) => {
     const a = ans[i];
-    if(a.dk){ done++; return; }
     if(a.revealed){ done++; answered++; if(a.pick != null && eqAns(a.pick, q.c)) correct++; }
   });
   return { n:SET.n, answered, correct, done };
@@ -132,7 +131,7 @@ async function boot(){
   if(!Array.isArray(SET.questions) || SET.questions.length !== SET.n){
     SET.n = SET.questions.length;   // เชื่อจำนวนจริงในไฟล์
   }
-  ans = SET.questions.map(() => ({ pick:null, conf:null, revealed:false, dk:false }));
+  ans = SET.questions.map(() => ({ pick:null, revealed:false }));
   cur = 0; elapsed = 0;
 
   const saved = await idbLoad(keyOf(id)) || loadLocal(id);
@@ -190,7 +189,7 @@ function renderPicker(index){
 function doneCount(id, n){
   const d = loadLocal(id);
   if(!d || d.v !== SCHEMA || !Array.isArray(d.ans) || d.ans.length !== n) return 0;
-  return d.ans.filter(a => a.revealed || a.dk).length;
+  return d.ans.filter(a => a.revealed).length;
 }
 
 /* ── เรนเดอร์ข้อ ── */
@@ -243,27 +242,19 @@ function renderQuestion(){
         else if(a.pick === c) b.classList.add('wrong');
         b.disabled = true;
       }
-      b.onclick = () => { if(a.revealed) return; a.pick = c; a.dk = false; save(); renderQuestion(); };
+      b.onclick = () => { if(a.revealed) return; a.pick = c; save(); renderQuestion(); };
       $('choices').appendChild(b);
     });
   }
 
-  /* ความมั่นใจ */
-  $('btnSure').innerHTML   = ART.sure(20)   + '<span>มั่นใจ</span>';
-  $('btnUnsure').innerHTML = ART.unsure(20) + '<span>ไม่มั่นใจ</span>';
-  $('btnSure').classList.toggle('on', a.conf === 'sure');
-  $('btnUnsure').classList.toggle('on', a.conf === 'unsure');
-  $('conf').style.display = a.revealed ? 'none' : '';
-
   /* เฉลย */
   const ex = $('exbox');
   if(a.revealed){
-    const ok = a.pick != null && eqAns(a.pick, q.c) && !a.dk;
-    $('exhead').className = 'exhead ' + (a.dk ? 'dk' : ok ? 'ok' : 'no');
-    $('exhead').innerHTML = a.dk
-      ? ART.book(22) + '<div>ยังไม่รู้ข้อนี้ • เฉลยอยู่ด้านล่าง</div>'
-      : (ok ? ART.sure(22) + '<div>ถูกต้อง</div>'
-            : ART['alert'](22) + '<div>ยังไม่ใช่ • คำตอบที่ถูกคือ ' + norm(q.c) + '</div>');
+    const ok = a.pick != null && eqAns(a.pick, q.c);
+    $('exhead').className = 'exhead ' + (ok ? 'ok' : 'no');
+    $('exhead').innerHTML = ok
+      ? ART.sure(22) + '<div>ถูกต้อง</div>'
+      : ART['alert'](22) + '<div>ยังไม่ใช่ • คำตอบที่ถูกคือ ' + norm(q.c) + '</div>';
     $('excontent').innerHTML = norm(q.ex);
     ex.style.display = '';
   } else {
@@ -271,8 +262,6 @@ function renderQuestion(){
   }
 
   $('btnReveal').style.display = a.revealed ? 'none' : '';
-  $('btnClear').style.display  = a.revealed ? 'none' : '';
-  $('btnDontknow').style.display = a.revealed ? 'none' : '';
   $('pauseBtn').style.display = a.revealed ? 'none' : '';   // พักเบรคได้เฉพาะตอนยังไม่เฉลย
   $('btnPrev').disabled = cur === 0;
   $('btnNext').textContent = cur === SET.n-1 ? 'ดูสรุปผล' : 'ถัดไป';
@@ -284,17 +273,13 @@ function renderQuestion(){
 /* ── ปุ่ม ── */
 function bindActions(){
   $('hintbtn').onclick = () => { ans[cur].hintShown = true; save(); renderQuestion(); };
-  $('fillin').oninput  = e => { ans[cur].pick = e.target.value; ans[cur].dk = false; save(); };
-  $('btnSure').onclick   = () => { toggleConf('sure'); };
-  $('btnUnsure').onclick = () => { toggleConf('unsure'); };
+  $('fillin').oninput  = e => { ans[cur].pick = e.target.value; save(); };
   $('btnReveal').onclick = () => {
     const a = ans[cur], q = SET.questions[cur];
     a.revealed = true;
-    if(!a.dk && a.pick != null && eqAns(a.pick, q.c) && typeof XP !== 'undefined') XP.award('p:'+SET.id+':'+cur, XP.BASE_POSN);
+    if(a.pick != null && eqAns(a.pick, q.c) && typeof XP !== 'undefined') XP.award('p:'+SET.id+':'+cur, XP.BASE_POSN);
     save(); renderQuestion();
   };
-  $('btnClear').onclick  = () => { const a = ans[cur]; a.pick = null; a.conf = null; a.dk = false; save(); renderQuestion(); };
-  $('btnDontknow').onclick = () => { const a = ans[cur]; a.dk = true; a.pick = null; a.revealed = true; save(); renderQuestion(); };
   $('btnPrev').onclick = () => { if(cur > 0){ cur--; save(); renderQuestion(); } };
   $('btnNext').onclick = () => {
     if(cur === SET.n-1){ showSummary(); return; }
@@ -303,33 +288,22 @@ function bindActions(){
   $('pauseBtn').onclick = pauseBreak;
   $('resumeBtn').onclick = resumeBreak;
 }
-function toggleConf(v){
-  const a = ans[cur];
-  if(a.revealed) return;
-  a.conf = a.conf === v ? null : v;
-  save(); renderQuestion();
-}
 
-/* ── สรุปผล ── 4 กลุ่ม, ปิดท้ายด้วยสิ่งที่ต้องทำต่อ ── */
+/* ── สรุปผล ── รายการข้อที่ยังไม่ถูก/ข้ามไป · ปิดท้ายด้วยสิ่งที่ต้องทำต่อ ── */
 function showSummary(){
   stopTimer(); save();
-  const G = { wrongSure:[], rightUnsure:[], dk:[], miss:[] };
-  let correct = 0, answered = 0;
+  const wrong = [], skipped = [];
+  let correct = 0;
   SET.questions.forEach((q, i) => {
     const a = ans[i];
-    if(a.dk){ G.dk.push(i+1); return; }
-    if(!a.revealed) return;
-    answered++;
-    const ok = a.pick != null && eqAns(a.pick, q.c);
-    if(ok){ correct++; if(a.conf === 'unsure') G.rightUnsure.push(i+1); }
-    else { (a.conf === 'sure' ? G.wrongSure : G.miss).push(i+1); }
+    if(!a.revealed){ skipped.push(i+1); return; }
+    if(a.pick != null && eqAns(a.pick, q.c)) correct++;
+    else wrong.push(i+1);
   });
 
   const groups = [
-    { k:'wrongSure',   icon:'alert',  title:'ผิดทั้งที่มั่นใจ', todo:'เข้าใจคลาดเคลื่อน อ่านเฉลยให้จบก่อนทำข้ออื่น' },
-    { k:'rightUnsure', icon:'unsure', title:'ถูกแต่ไม่มั่นใจ',  todo:'ยังไม่แน่น ทำซ้ำภายใน 3 วัน' },
-    { k:'dk',          icon:'book',   title:'ไม่รู้เลย',        todo:'เปิดเล่ม บทที่เกี่ยว' },
-    { k:'miss',        icon:'grid',   title:'พลาด',             todo:'เขียนตารางไล่ค่าใหม่' },
+    { list:wrong,   icon:'alert', cls:'wrongSure', title:'ยังไม่ถูก', todo:'อ่านเฉลยให้จบ แล้วทำซ้ำภายใน 3 วัน' },
+    { list:skipped, icon:'book',  cls:'dk',        title:'ข้ามไป',    todo:'กลับไปลองทำให้ครบ' },
   ];
 
   const targetSec = SET.targetMin*60;
@@ -337,15 +311,15 @@ function showSummary(){
     ? 'ใช้เวลา ' + mmss(elapsed) + ' • ในเป้า ' + SET.targetMin + ' นาที'
     : 'ใช้เวลา ' + mmss(elapsed) + ' • เกินเป้า ' + SET.targetMin + ' นาที';
 
-  let cards = groups.filter(g => G[g.k].length).map(g =>
-    '<div class="sumcard ' + g.k + '">'
+  let cards = groups.filter(g => g.list.length).map(g =>
+    '<div class="sumcard ' + g.cls + '">'
     + '<div class="sumicon">' + ART[g.icon](26) + '</div>'
     + '<div style="flex:1;min-width:0">'
-      + '<div class="sumtitle">' + g.title + ' — ข้อ ' + G[g.k].join(', ') + '</div>'
+      + '<div class="sumtitle">' + g.title + ' — ข้อ ' + g.list.join(', ') + '</div>'
       + '<div class="sumtodo">' + g.todo + '</div>'
     + '</div></div>'
   ).join('');
-  if(!cards) cards = '<div class="empty">ไม่มีข้อค้าง • ชุดถัดไปจะเพิ่มสัดส่วนข้อลึก</div>';
+  if(!cards) cards = '<div class="empty">ถูกทั้งชุด • ไม่มีข้อค้าง</div>';
 
   $('quiz').style.display = 'none';
   const s = $('summary');

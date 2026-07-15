@@ -93,21 +93,16 @@ function readHome(){ try{ const d=JSON.parse(localStorage.getItem('sv.home.v2'))
 function readEng(){ try{ return JSON.parse(localStorage.getItem('sv.eng.v1')); }catch(e){ return null; } }
 
 const GROUPS = [
-  { k:'wrongSure',   icon:'alert',  title:'ผิดทั้งที่มั่นใจ', todo:'เข้าใจคลาดเคลื่อน อ่านเฉลยให้จบ' },
-  { k:'rightUnsure', icon:'unsure', title:'ถูกแต่ไม่มั่นใจ',  todo:'ยังไม่แน่น ทำซ้ำภายใน 3 วัน' },
-  { k:'dk',          icon:'book',   title:'ไม่รู้เลย',        todo:'เปิดเล่ม บทที่เกี่ยว' },
-  { k:'miss',        icon:'grid',   title:'พลาด',             todo:'เขียนตารางไล่ค่าใหม่' },
+  { k:'wrong',   icon:'alert', title:'ยังไม่ถูก', todo:'อ่านเฉลยให้จบ แล้วทำซ้ำภายใน 3 วัน' },
+  { k:'skipped', icon:'book',  title:'ข้ามไป',    todo:'กลับไปลองทำให้ครบ' },
 ];
 
 function groupsFor(questions, ans){
-  const G = { wrongSure:[], rightUnsure:[], dk:[], miss:[] };
+  const G = { wrong:[], skipped:[] };
   questions.forEach((q,i)=>{
     const a = ans[i]; if(!a) return;
-    if(a.dk){ G.dk.push(i+1); return; }
-    if(!a.revealed) return;
-    const ok = a.pick!=null && eqAns(a.pick, q.c);
-    if(ok){ if(a.conf==='unsure') G.rightUnsure.push(i+1); }
-    else { (a.conf==='sure'?G.wrongSure:G.miss).push(i+1); }
+    if(!a.revealed){ G.skipped.push(i+1); return; }
+    if(!(a.pick!=null && eqAns(a.pick, q.c))) G.wrong.push(i+1);
   });
   return G;
 }

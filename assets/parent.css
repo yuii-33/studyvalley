@@ -35,10 +35,8 @@
 .setstat{font-weight:700;font-size:15px;color:var(--ink)}
 .pcard{display:flex;align-items:flex-start;gap:11px;background:var(--card);border:2px solid var(--line-2);
   border-radius:13px;padding:11px 12px;box-shadow:var(--lift-1);margin-bottom:8px}
-.pcard.wrongSure{border-color:var(--rose-ring)}
-.pcard.rightUnsure{border-color:var(--gold-ring)}
-.pcard.dk{border-color:var(--blue-ring)}
-.pcard.miss{border-color:var(--line)}
+.pcard.wrong{border-color:var(--rose-ring)}
+.pcard.skipped{border-color:var(--blue-ring)}
 .ptitle{font-weight:800;font-size:15.5px;color:var(--ink-hi);line-height:1.35}
 .ptodo{font-size:14px;color:var(--muted);margin-top:2px}
 .allok{text-align:center;color:var(--green-ink);font-weight:700;font-size:14.5px;
