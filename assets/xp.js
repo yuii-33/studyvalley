@@ -1,11 +1,12 @@
 /* ══════════════════════════════════════════════════════════
    assets/xp.js — ระบบ EXP กลาง (ใช้ร่วมทุกหน้า)
    เน้นความสม่ำเสมอ : cap รายวัน + โบนัส streak · นับซ้ำไม่ได้
-   เลเวลทุก 500 XP · ข้อถูก 15 · คำศัพท์ 10 · cap 300/วัน
+   เลเวลทุก 500 XP · ข้อถูก 40 · คำศัพท์ 10 · cap 300/วัน
+   (แบบฝึกให้เยอะกว่าคำศัพท์มาก เพื่อไม่ให้เกมศัพท์เป็นทางลัดเก็บเลเวล)
    ══════════════════════════════════════════════════════════ */
 const XP = (function(){
   const KEY = 'sv.xp.v1';
-  const CAP = 300, PER_LEVEL = 500, BASE_POSN = 15, BASE_ENG = 10;
+  const CAP = 300, PER_LEVEL = 500, BASE_POSN = 40, BASE_ENG = 10;
   const IDB_DB = 'studyvalley', IDB_STORE = 'kv';
 
   function idbOpen(){ return new Promise((res,rej)=>{ const r=indexedDB.open(IDB_DB,1);

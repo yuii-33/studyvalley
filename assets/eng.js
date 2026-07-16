@@ -8,6 +8,7 @@ const KEYS = 'QWERTYUIOP ASDFGHJKL ZXCVBNM';
 
 let DATA = null;            // { levels, words }
 let pool = [], order = [], idx = 0;
+let stats = {};             // สถิติต่อคำ { คำ: {c:ถูกกี่ครั้ง, x:ผิดกี่ครั้ง} } — ใช้ถ่วงน้ำหนักการวน
 let cur = null, guessed = new Set(), wrong = 0, phase = 'play';
 let level = 'mix';
 let daily = { date:'', count:0 }, streak = 0, dailyGoal = 5;
@@ -26,7 +27,7 @@ async function idbGet(k){ try{ const db=await idbOpen();
 
 function todayStr(){ const d=new Date(); const p=n=>String(n).padStart(2,'0');
   return d.getFullYear()+'-'+p(d.getMonth()+1)+p(d.getDate()); }
-function snapshot(){ return { v:SCHEMA, level, daily, streak }; }
+function snapshot(){ return { v:SCHEMA, level, daily, streak, stats }; }
 let saveTimer;
 function save(){ const d=snapshot();
   try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){}
@@ -34,6 +35,25 @@ function save(){ const d=snapshot();
 
 /* ── สุ่ม ── */
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* ── ถ่วงน้ำหนักการวน ──
+   ยังวนครบทุกคำในรอบเหมือนเดิม แต่คำที่ตอบถูกบ่อยจะถูก "ข้ามรอบ" บ่อยขึ้น
+   → คำง่าย (apple) ยังมาอยู่ แค่นาน ๆ ที · คำที่ยังผิดอยู่มาทุกรอบ */
+const MIN_CYCLE = 10, FLOOR = 0.15;        // ต่ำสุด ~1 ใน 7 รอบ (ไม่หายถาวร)
+function chance(w){
+  const st = stats[w];
+  if(!st || !st.c) return 1;               // ยังไม่เคยตอบถูก → มาแน่
+  if((st.x || 0) >= st.c) return 1;        // ผิดมากกว่าหรือเท่าถูก → ยังไม่แม่น มาแน่
+  return Math.max(FLOOR, 1 / (st.c + 1));  // ถูก 1 ครั้ง→1/2 · 2→1/3 · 3→1/4 …
+}
+function buildOrder(){
+  const sel = [], rest = [];
+  pool.forEach((w, i) => { (Math.random() < chance(w.w) ? sel : rest).push(i); });
+  const min = Math.min(MIN_CYCLE, pool.length);
+  if(sel.length < min) shuffle(rest).slice(0, min - sel.length).forEach(i => sel.push(i));
+  return shuffle(sel);
+}
+function bump(w, k){ const st = stats[w] || (stats[w] = {c:0, x:0}); st[k] = (st[k] || 0) + 1; }
 
 /* ── โหลด ── */
 async function boot(){
@@ -43,6 +63,7 @@ async function boot(){
     if(['mix','lv1','lv2','lv3'].includes(saved.level)) level = saved.level;
     if(saved.daily) daily = saved.daily;
     streak = saved.streak||0;
+    if(saved.stats && typeof saved.stats === 'object') stats = saved.stats;
   }
   if(daily.date !== todayStr()) daily = { date:todayStr(), count:0 };
 
@@ -70,7 +91,7 @@ function startLevel(lv){
   level = lv;
   const want = lv==='mix' ? null : Number(lv.slice(2));
   pool = DATA.words.filter(w => want===null || w.lv===want);
-  order = shuffle(pool.map((_,i)=>i));
+  order = buildOrder();
   idx = 0;
   renderChips(); save();
   loadWord();
@@ -78,7 +99,7 @@ function startLevel(lv){
 
 /* ── คำ ── */
 function loadWord(){
-  if(idx >= order.length){ order = shuffle(order); idx = 0; }   // ครบคลังแล้ว วนใหม่
+  if(idx >= order.length){ order = buildOrder(); idx = 0; }   // ครบรอบแล้ว สุ่มรอบใหม่ (ถ่วงน้ำหนัก)
   cur = pool[order[idx]];
   guessed = new Set(); wrong = 0; phase = 'play';
   $('engnav').style.display = 'none';
@@ -104,10 +125,15 @@ function guess(ch){
 function win(){
   phase='reveal'; streak++;
   daily = { date:todayStr(), count: daily.count + 1 };
+  bump(cur.w, 'c');                       // ตอบถูก → รอบหน้าโผล่ถี่น้อยลง
   if(typeof XP !== 'undefined') XP.award('e:'+cur.w, XP.BASE_ENG);
   save(); render(); speak(cur.w);
 }
-function lose(){ phase='reveal'; streak=0; save(); render(); speak(cur.w); }
+function lose(){
+  phase='reveal'; streak=0;
+  bump(cur.w, 'x');                       // ตอบผิด → ยังไม่แม่น โผล่ทุกรอบ
+  save(); render(); speak(cur.w);
+}
 
 function onPhysicalKey(e){
   const ch = (e.key||'').toUpperCase();
