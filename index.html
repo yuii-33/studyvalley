@@ -108,12 +108,16 @@
     </a>
   </div>
 
-  <div class="grid" style="margin-top:14px;gap:8px">
+  <div class="ribbon"><span>สำรองข้อมูล</span></div>
+  <div class="backupinfo" id="backupInfo"></div>
+  <div class="grid" style="gap:8px">
     <button class="btn soft" id="backupBtn" style="flex:1">สำรองผล</button>
     <button class="btn soft" id="restoreBtn" style="flex:1">กู้คืน</button>
   </div>
   <input type="file" id="restoreFile" accept="application/json,.json" style="display:none">
   <div class="msg" id="msg"></div>
+  <div class="keepwarn">อย่าลบไอคอนแอปออกจากหน้าจอโฮม — ข้อมูลจะหายทั้งหมด<br>
+    ถ้าจำเป็นต้องลบ ให้กดสำรองผลเก็บไฟล์ไว้ก่อน แล้วค่อยกู้คืนทีหลัง</div>
 
   <a href="parent/" style="display:block;text-align:center;margin-top:18px;color:var(--dim);
     font-weight:600;font-size:13.5px">สำหรับผู้ปกครอง — ดูผลการเรียน</a>

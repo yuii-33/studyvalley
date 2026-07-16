@@ -183,6 +183,8 @@ function render(){
     ? '<span class="chip green">ทำแล้ว '+attempted+(nSets?' / '+nSets:'')+' ชุด</span>'
       + (totAnswered ? '<span class="chip gold">ถูก '+Math.round(totCorrect/totAnswered*100)+'%</span>' : '')
     : '<span class="chip plain">ยังไม่เริ่ม</span>';
+
+  renderBackupInfo();
 }
 
 
@@ -219,18 +221,55 @@ function collectPosn(){
     if(k && k.indexOf('sv.posn.') === 0){ try{ out[k] = JSON.parse(localStorage.getItem(k)); }catch(e){} } }
   return out;
 }
-$('backupBtn').onclick = ()=>{
-  const data = { v:SCHEMA, profile:store, posn:collectPosn() };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
+const readRaw = k => { try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } };
+/* ไฟล์สำรองต้องครบ: โปรไฟล์ + ผลทำโจทย์ + XP + คลังคำศัพท์ */
+const backupData = () => ({ v:SCHEMA, profile:store, posn:collectPosn(),
+                            xp:readRaw('sv.xp.v1'), eng:readRaw('sv.eng.v1') });
+
+/* จำวันที่สำรองล่าสุด เพื่อเตือนให้กดทุกวัน */
+const BK_KEY = 'sv.backup.v1';
+const lastBackup = () => { const d = readRaw(BK_KEY); return (d && d.at) || 0; };
+function markBackup(){ try{ localStorage.setItem(BK_KEY, JSON.stringify({at:Date.now()})); }catch(e){} }
+
+$('backupBtn').onclick = async ()=>{
   const dt = new Date(), p = n => String(n).padStart(2,'0');
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'studyvalley-'+dt.getFullYear()+p(dt.getMonth()+1)+p(dt.getDate())+'.json';
+  const name = 'studyvalley-'+dt.getFullYear()+p(dt.getMonth()+1)+p(dt.getDate())+'.json';
+  const json = JSON.stringify(backupData(), null, 2);
+  /* Web Share ก่อน — ใช้ได้ตอนเปิดจากไอคอนโฮม (PWA) ที่ดาวน์โหลดมักไม่ทำงาน */
+  try{
+    const file = new File([json], name, {type:'application/json'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({ files:[file], title:'สำรองผล Study Valley' });
+      markBackup(); render(); setMsg('สำรองแล้ว • เลือก "บันทึกลงไฟล์" → โฟลเดอร์ iCloud');
+      return;
+    }
+  }catch(e){ if(e && e.name === 'AbortError'){ setMsg('ยกเลิกการสำรอง'); return; } }
+  /* สำรอง: ดาวน์โหลดไฟล์ */
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 1000);
-  setMsg('สำรองแล้ว • เลือก "บันทึกลงไฟล์" แล้วเก็บไว้ในโฟลเดอร์ iCloud เพื่อย้ายเครื่อง');
+  markBackup(); render(); setMsg('สำรองแล้ว • เก็บไฟล์ไว้ในโฟลเดอร์ iCloud');
 };
+
+/* แถบสถานะการสำรอง */
+function renderBackupInfo(){
+  const at = lastBackup(), info = $('backupInfo'), btn = $('backupBtn');
+  const day = t => { const d = new Date(t); d.setHours(0,0,0,0); return d.getTime(); };
+  let txt, warn;
+  if(!at){ txt = 'ยังไม่เคยสำรอง — กดสำรองผลเก็บไฟล์ไว้'; warn = true; }
+  else {
+    const n = Math.round((day(Date.now()) - day(at)) / 86400000);
+    warn = n >= 1;
+    txt = n <= 0 ? 'สำรองล่าสุด: วันนี้'
+        : n === 1 ? 'สำรองล่าสุด: เมื่อวาน — ควรกดสำรองอีกครั้ง'
+        : 'สำรองล่าสุด: ' + n + ' วันก่อน — ควรกดสำรอง';
+  }
+  info.textContent = txt;
+  info.classList.toggle('warn', warn);
+  btn.classList.toggle('needbk', warn);
+}
 
 let pendingRestore = null, restoreArmed = false, restoreTimer;
 function disarmRestore(){ restoreArmed = false; pendingRestore = null;
@@ -249,8 +288,11 @@ $('restoreBtn').onclick = ()=>{
         if(k.indexOf('sv.posn.') === 0){ try{ localStorage.setItem(k, JSON.stringify(d.posn[k])); idbPut(k, d.posn[k]); }catch(e){} }
       });
     }
+    /* คืน XP + คลังคำศัพท์ ด้วย ไม่งั้นเลเวลกลับเป็น 0 */
+    if(d.xp){ try{ localStorage.setItem('sv.xp.v1', JSON.stringify(d.xp)); idbPut('sv.xp.v1', d.xp); }catch(e){} }
+    if(d.eng){ try{ localStorage.setItem('sv.eng.v1', JSON.stringify(d.eng)); idbPut('sv.eng.v1', d.eng); }catch(e){} }
     disarmRestore(); save(); render();
-    setMsg('กู้คืนแล้ว • ข้อมูลและผลทำโจทย์ถูกแทนที่จากไฟล์สำรอง');
+    setMsg('กู้คืนแล้ว • โปรไฟล์ ผลทำโจทย์ XP และคลังคำศัพท์ ถูกแทนที่จากไฟล์สำรอง');
     return;
   }
   $('restoreFile').value = '';
@@ -266,8 +308,9 @@ $('restoreFile').onchange = e=>{
     }
     pendingRestore = d;
     const nSets = d.posn ? Object.keys(d.posn).length : 0;
+    const xp = (d.xp && d.xp.total) || 0;
     armRestore();
-    setMsg('ไฟล์สำรอง: ' + d.profile.name + ' • ' + d.profile.goals.length + ' เป้าหมาย • ผลทำโจทย์ ' + nSets + ' ชุด — แตะ "ยืนยันกู้คืน"');
+    setMsg('ไฟล์สำรอง: ' + d.profile.name + ' • ผลทำโจทย์ ' + nSets + ' ชุด • ' + xp + ' XP — แตะ "ยืนยันกู้คืน"');
   };
   r.readAsText(f);
 };
