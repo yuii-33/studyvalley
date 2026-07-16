@@ -57,3 +57,7 @@ const XP = (function(){
     inLevel: () => read().total % PER_LEVEL,
   };
 })();
+
+/* ขอที่เก็บแบบถาวร — ลดโอกาสถูก iOS/เบราว์เซอร์ล้างอัตโนมัติเมื่อพื้นที่ไม่พอ
+   หมายเหตุ: กัน "ผู้ใช้ลบไอคอนออกจากโฮม" ไม่ได้ (iOS ล้าง storage ของ PWA ทิ้งเสมอ) */
+try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
