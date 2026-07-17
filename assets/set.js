@@ -31,7 +31,7 @@ let cur = 0;           // ข้อปัจจุบัน (0-based)
 const ROOM = new URLSearchParams(location.search).get('room') === 'logic' ? 'logic' : 'posn';
 const ROOMCFG = {
   posn:  { dir:'../data/posn/',  title:'เลือกชุดทำโจทย์', xpKey:'p', xpBase:(typeof XP!=='undefined'?XP.BASE_POSN:40),  timer:true,  filters:true  },
-  logic: { dir:'../data/logic/', title:'ปัญหาเชาวน์',      xpKey:'g', xpBase:(typeof XP!=='undefined'?XP.BASE_LOGIC:25), timer:false, filters:false },
+  logic: { dir:'../data/logic/', title:'Logic Game',      xpKey:'g', xpBase:(typeof XP!=='undefined'?XP.BASE_LOGIC:25), timer:false, filters:false },
 }[ROOM];
 const roomQuery = id => '?' + (ROOM !== 'posn' ? 'room=' + ROOM + '&' : '') + 'id=' + id;
 
