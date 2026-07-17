@@ -58,7 +58,7 @@
   <div class="hint" id="toNext">อีก 1000 XP จะเลเวลอัป</div>
 
   <!-- เป้าหมาย -->
-  <div class="ribbon"><span>เป้าหมายของฉัน</span></div>
+  <div class="ribbon"><span>Quest Board</span></div>
   <div class="stack" id="goals"></div>
   <div style="height:10px"></div>
   <button class="btn dash" id="addBtn">+ เพิ่มเป้าหมาย</button>
@@ -81,8 +81,8 @@
     </div>
   </div>
 
-  <!-- แบบฝึกเตรียมสอบ -->
-  <div class="ribbon"><span>แบบฝึกเตรียมสอบ</span></div>
+  <!-- The Farm : แบบฝึกจริงจัง (ไทย) -->
+  <div class="ribbon"><span>The Farm</span></div>
   <div class="grid">
     <a class="card row" href="posn/set.html" style="flex:1 1 100%;position:relative">
       <span class="newbadge cornernew" id="rmAnew" style="display:none">new</span>
@@ -95,20 +95,28 @@
     </a>
   </div>
 
-  <!-- คลังคำศัพท์ (เล่นเสริม) -->
-  <div class="ribbon"><span>คลังคำศัพท์</span></div>
+  <!-- The Arcade : โซนเกม (ชื่อเกมอังกฤษ) -->
+  <div class="ribbon"><span>The Arcade</span></div>
   <div class="grid">
     <a class="card row" href="english/" style="flex:1 1 100%">
       <div class="tile" id="rmB"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:800;font-size:18px">คลังคำศัพท์อังกฤษ</div>
-        <div style="font-size:14px;color:var(--muted);margin:1px 0 5px">เกมกู้ภัยจรวด • 320 คำ</div>
+        <div style="font-weight:800;font-size:18px">Word Rocket</div>
+        <div style="font-size:14px;color:var(--muted);margin:1px 0 5px">เกมทายศัพท์ • 320 คำ</div>
         <div class="grid" style="gap:5px"><span class="chip blue">3 ระดับ</span></div>
+      </div>
+    </a>
+    <a class="card row" href="posn/set.html?room=logic" style="flex:1 1 100%">
+      <div class="tile"><img src="assets/tiles/magnifier.png" width="42" height="42" alt="" style="display:block;border-radius:8px"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:18px">Puzzle Peak</div>
+        <div style="font-size:14px;color:var(--muted);margin:1px 0 5px">ปัญหาเชาวน์ / ตรรกะ</div>
+        <div class="grid" style="gap:5px" id="rmCchips"></div>
       </div>
     </a>
   </div>
 
-  <div class="ribbon"><span>สำรองข้อมูล</span></div>
+  <div class="ribbon"><span>The Vault</span></div>
   <div class="backupinfo" id="backupInfo"></div>
   <div class="grid" style="gap:8px">
     <button class="btn soft" id="backupBtn" style="flex:1">สำรองผล</button>

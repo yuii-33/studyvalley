@@ -6,7 +6,7 @@
    ══════════════════════════════════════════════════════════ */
 const XP = (function(){
   const KEY = 'sv.xp.v1';
-  const CAP = 300, PER_LEVEL = 500, BASE_POSN = 40, BASE_ENG = 10;
+  const CAP = 300, PER_LEVEL = 500, BASE_POSN = 40, BASE_ENG = 10, BASE_LOGIC = 25;
   const IDB_DB = 'studyvalley', IDB_STORE = 'kv';
 
   function idbOpen(){ return new Promise((res,rej)=>{ const r=indexedDB.open(IDB_DB,1);
@@ -50,7 +50,7 @@ const XP = (function(){
   }
 
   return {
-    award, CAP, PER_LEVEL, BASE_POSN, BASE_ENG,
+    award, CAP, PER_LEVEL, BASE_POSN, BASE_ENG, BASE_LOGIC,
     total: () => read().total,
     todayXP: () => read().todayXP,
     streak: () => liveStreak(read()),

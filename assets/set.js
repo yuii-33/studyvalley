@@ -27,9 +27,17 @@ let META = null;       // แถวจาก index.json ของชุดนี
 let ans = [];          // สถานะต่อข้อ { pick, revealed }
 let cur = 0;           // ข้อปัจจุบัน (0-based)
 
+/* ── ห้อง (room) : แบบฝึก สอวน. = posn · ปัญหาเชาวน์ = logic ── */
+const ROOM = new URLSearchParams(location.search).get('room') === 'logic' ? 'logic' : 'posn';
+const ROOMCFG = {
+  posn:  { dir:'../data/posn/',  title:'เลือกชุดทำโจทย์', xpKey:'p', xpBase:(typeof XP!=='undefined'?XP.BASE_POSN:40),  timer:true,  filters:true  },
+  logic: { dir:'../data/logic/', title:'ปัญหาเชาวน์',      xpKey:'g', xpBase:(typeof XP!=='undefined'?XP.BASE_LOGIC:25), timer:false, filters:false },
+}[ROOM];
+const roomQuery = id => '?' + (ROOM !== 'posn' ? 'room=' + ROOM + '&' : '') + 'id=' + id;
+
 /* ── เซฟ 2 ที่ : localStorage + IndexedDB (ตรวจ schema + จำนวนข้อ ก่อนใช้) ── */
 const SCHEMA = 1;
-const keyOf = id => 'sv.posn.' + id;
+const keyOf = id => 'sv.' + ROOM + '.' + id;   // posn → sv.posn.<id> (เหมือนเดิม) · logic → sv.logic.<id>
 
 function computeStat(){
   let answered = 0, correct = 0, done = 0;
@@ -107,7 +115,7 @@ window.addEventListener('blur', stopTimer);
 window.addEventListener('focus', syncTimer);
 /* เดินเวลาเฉพาะตอน: อยู่ในโหมดทำโจทย์ · ข้อยังไม่เฉลย · ไม่พักเบรค · ไม่สลับแอป */
 function timerShouldRun(){
-  return SET && $('quiz').style.display !== 'none' && $('summary').style.display === 'none'
+  return ROOMCFG.timer && SET && $('quiz').style.display !== 'none' && $('summary').style.display === 'none'
       && !document.hidden && !manualPaused && ans[cur] && !ans[cur].revealed;
 }
 function syncTimer(){ if(timerShouldRun()) startTimer(); else stopTimer(); }
@@ -125,14 +133,14 @@ async function boot(){
   const hl = $('homelink'); if(hl) hl.innerHTML = ART.home(17) + '<span>หน้าแรก</span>';
   const id = new URLSearchParams(location.search).get('id');
   let index;
-  try{ index = await loadJSON('../data/posn/index.json'); }
+  try{ index = await loadJSON(ROOMCFG.dir + 'index.json'); }
   catch(e){ return fail('เปิดรายการชุดไม่ได้ — ต้องเปิดผ่านเว็บ (เซิร์ฟเวอร์) ไม่ใช่เปิดไฟล์ตรง ๆ'); }
 
   if(!id){ return renderPicker(index); }
 
   META = (index.sets || []).find(s => s.id === id) || null;
   let data;
-  try{ data = await loadJSON('../data/posn/' + id + '.json'); }
+  try{ data = await loadJSON(ROOMCFG.dir + id + '.json'); }
   catch(e){ return fail('เปิดชุด "' + id + '" ไม่ได้'); }
 
   SET = { id, n: data.n, targetMin: data.targetMin, questions: data.questions };
@@ -150,7 +158,7 @@ async function boot(){
   }
 
   $('settitle').textContent = META ? META.title : id;
-  $('timer').style.display = '';
+  $('timer').style.display = ROOMCFG.timer ? '' : 'none';   // ปัญหาเชาวน์ไม่จับเวลา
   $('picker').style.display = 'none';
   $('quiz').style.display = '';
   bindActions();
@@ -168,13 +176,13 @@ const PAGE_SIZE = 6;
 let INDEX_CACHE = null, pickFilter = 'all', pickPage = 0;
 function renderPicker(index){
   INDEX_CACHE = index;
-  $('settitle').textContent = 'เลือกชุดทำโจทย์';
+  $('settitle').textContent = ROOMCFG.title;
   const box = $('picker');
   box.style.display = '';
 
   const filters = [{k:'all',t:'ทั้งหมด'},{k:'math',t:'เลข'},{k:'com',t:'คอม'},{k:'mock',t:'ประเมิน'}];
-  const chips = '<div class="pickfilter">' + filters.map(f =>
-    '<button class="lvchip'+(f.k===pickFilter?' on':'')+'" data-f="'+f.k+'">'+f.t+'</button>').join('') + '</div>';
+  const chips = ROOMCFG.filters ? ('<div class="pickfilter">' + filters.map(f =>
+    '<button class="lvchip'+(f.k===pickFilter?' on':'')+'" data-f="'+f.k+'">'+f.t+'</button>').join('') + '</div>') : '';
 
   /* ป้าย "new" : เพิ่งเพิ่มภายใน newHours ชั่วโมง (อิงเวลาจริงจาก added) */
   const newWin = (index.newHours || 48) * 3600000;
@@ -193,12 +201,13 @@ function renderPicker(index){
     const sj = SUBJ[s.subject] || {t:s.subject,c:'plain'};
     const done = doneCount(s.id, s.n);
     const isNew = s.added && (Date.now() - s.added) < newWin && !done;   // เพิ่งเพิ่ม + ยังไม่เริ่ม
-    return '<a class="card row pickrow" href="?id=' + s.id + '">'
+    const meta = ROOMCFG.timer ? (s.n + ' ข้อ • เป้า ' + s.targetMin + ' นาที') : (s.n + ' ข้อ');
+    return '<a class="card row pickrow" href="' + roomQuery(s.id) + '">'
       + '<div class="tile">' + ART.book(26) + '</div>'
       + '<div style="flex:1;min-width:0">'
         + '<div class="picktitle">' + (isNew ? '<span class="newbadge">new</span> ' : '') + s.title + '</div>'
         + '<div class="pickmeta"><span class="chip ' + sj.c + '">' + sj.t + '</span>'
-          + '<span class="pickn">' + s.n + ' ข้อ • เป้า ' + s.targetMin + ' นาที</span></div>'
+          + '<span class="pickn">' + meta + '</span></div>'
       + '</div>'
       + (done ? '<span class="chip green">ทำแล้ว ' + done + '/' + s.n + '</span>' : '')
       + '</a>';
@@ -238,7 +247,7 @@ function renderQuestion(){
 
   $('qprogfill').style.width = ((cur+1)/SET.n*100) + '%';
   $('qcount').textContent = 'ข้อ ' + (cur+1) + ' / ' + SET.n;
-  $('qtarget').textContent = 'เป้า ' + SET.targetMin + ' นาที';
+  $('qtarget').textContent = ROOMCFG.timer ? ('เป้า ' + SET.targetMin + ' นาที') : '';
 
   /* ป้ายกำกับ */
   let badges = '';
@@ -302,7 +311,7 @@ function renderQuestion(){
   }
 
   $('btnReveal').style.display = a.revealed ? 'none' : '';
-  $('pauseBtn').style.display = a.revealed ? 'none' : '';   // พักเบรคได้เฉพาะตอนยังไม่เฉลย
+  $('pauseBtn').style.display = (ROOMCFG.timer && !a.revealed) ? '' : 'none';   // พักเบรคเฉพาะห้องที่จับเวลา + ยังไม่เฉลย
   $('btnPrev').disabled = cur === 0;
   $('btnNext').textContent = cur === SET.n-1 ? 'ดูสรุปผล' : 'ถัดไป';
 
@@ -317,7 +326,7 @@ function bindActions(){
   $('btnReveal').onclick = () => {
     const a = ans[cur], q = SET.questions[cur];
     a.revealed = true;
-    if(a.pick != null && eqAns(a.pick, q.c) && typeof XP !== 'undefined') XP.award('p:'+SET.id+':'+cur, XP.BASE_POSN);
+    if(a.pick != null && eqAns(a.pick, q.c) && typeof XP !== 'undefined') XP.award(ROOMCFG.xpKey+':'+SET.id+':'+cur, ROOMCFG.xpBase);
     save(); renderQuestion();
   };
   $('btnPrev').onclick = () => { if(cur > 0){ cur--; save(); renderQuestion(); } };
@@ -347,9 +356,10 @@ function showSummary(){
   ];
 
   const targetSec = SET.targetMin*60;
-  const timeLine = elapsed <= targetSec
-    ? 'ใช้เวลา ' + mmss(elapsed) + ' • ในเป้า ' + SET.targetMin + ' นาที'
-    : 'ใช้เวลา ' + mmss(elapsed) + ' • เกินเป้า ' + SET.targetMin + ' นาที';
+  const timeLine = !ROOMCFG.timer ? ''
+    : elapsed <= targetSec
+      ? 'ใช้เวลา ' + mmss(elapsed) + ' • ในเป้า ' + SET.targetMin + ' นาที'
+      : 'ใช้เวลา ' + mmss(elapsed) + ' • เกินเป้า ' + SET.targetMin + ' นาที';
 
   let cards = groups.filter(g => g.list.length).map(g =>
     '<div class="sumcard ' + g.cls + '">'
@@ -368,7 +378,7 @@ function showSummary(){
     '<div class="ribbon"><span>สรุปผล</span></div>'
     + '<div class="sumtop card">'
       + '<div class="sumscore">ถูก ' + correct + ' / ' + SET.n + '</div>'
-      + '<div class="sumtime">' + timeLine + '</div>'
+      + (timeLine ? '<div class="sumtime">' + timeLine + '</div>' : '')
     + '</div>'
     + '<div class="stack" style="margin-top:12px">' + cards + '</div>'
     + '<div class="grid" style="margin-top:16px;gap:8px">'

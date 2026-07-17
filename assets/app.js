@@ -10,6 +10,7 @@ const store = {
 };
 let armDel = null, armTimer = null, formKind = 'exam';
 let INDEX = null;                 // data/posn/index.json (ถ้าโหลดได้)
+let LOGIC = null;                 // data/logic/index.json (ปัญหาเชาวน์ — ยังว่าง)
 
 const $ = id => document.getElementById(id);
 const setMsg = t => { $('msg').textContent = t || ''; };
@@ -84,6 +85,8 @@ async function boot(){
   if(!AVATARS.includes(store.art)) store.art = 'cat';   // รูปเก่า (rocket/fox/rabbit) → เริ่มใหม่
   try{ INDEX = await (await fetch('data/posn/index.json', {cache:'no-cache'})).json(); }
   catch(e){ INDEX = null; }        // เปิดแบบ file:// จะโหลดไม่ได้ — คะแนนยังคิดจาก localStorage ได้
+  try{ LOGIC = await (await fetch('data/logic/index.json', {cache:'no-cache'})).json(); }
+  catch(e){ LOGIC = null; }
   $('rmA').innerHTML = '<img src="assets/tiles/openbook.png" width="42" height="42" alt="" style="display:block;border-radius:8px">';
   $('rmB').innerHTML = '<img src="assets/tiles/rocket.png" width="42" height="42" alt="" style="display:block;border-radius:8px">';
   render();
@@ -183,6 +186,14 @@ function render(){
     ? '<span class="chip green">ทำแล้ว '+attempted+(nSets?' / '+nSets:'')+' ชุด</span>'
       + (totAnswered ? '<span class="chip gold">ถูก '+Math.round(totCorrect/totAnswered*100)+'%</span>' : '')
     : '<span class="chip plain">ยังไม่เริ่ม</span>';
+
+  /* การ์ด Puzzle Peak (ปัญหาเชาวน์) — ห้อง logic */
+  if($('rmCchips')){
+    const nLogic = LOGIC ? LOGIC.sets.length : 0;
+    $('rmCchips').innerHTML = nLogic
+      ? '<span class="chip blue">'+nLogic+' ชุด</span>'
+      : '<span class="chip plain">ยังไม่มีชุด</span>';
+  }
 
   renderBackupInfo();
 }
