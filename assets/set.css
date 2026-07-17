@@ -137,6 +137,54 @@
 .qbody .warn .h,.excontent .warn .h{font-weight:800;color:var(--rose-ink)}
 .qbody .hl td,.excontent .hl td,.qbody td.hl,.excontent td.hl{background:var(--gold-pale)}
 
+/* ── ห้องปริศนา (logic) ── */
+.pzicon{display:inline-flex}
+.pzstars{display:inline-flex;gap:1px;align-items:center}
+.pzstars svg{width:16px;height:16px}
+.pzfill{margin-top:13px}
+.pzfill .field{font-size:18px;font-weight:700}
+.pzcheck{width:100%;margin-top:11px}
+.pzresult{display:flex;align-items:center;gap:8px;justify-content:center;font-weight:800;font-size:15.5px;
+  padding:9px 14px;border-radius:12px;margin-top:11px;line-height:1.35}
+.pzresult.ok{background:var(--green-pale);color:var(--green-ink)}
+.pzresult.no{background:var(--rose);color:var(--rose-ink)}
+.pzresult svg{flex:0 0 auto}
+
+/* ช่องเลือกชื่อ (slots) */
+.slotwrap{display:flex;flex-direction:column;gap:9px;margin-top:13px}
+.slotrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);
+  border:2px solid var(--line-2);border-radius:13px;padding:10px 12px;box-shadow:var(--lift-1)}
+.slotrow.ok{border-color:var(--green-x);background:var(--green-pale)}
+.slotrow.no{border-color:var(--rose-ink);background:var(--rose)}
+.slotchips{display:flex;gap:6px;flex-wrap:wrap}
+.slotchip{border:0;cursor:pointer;font-weight:700;font-size:15px;color:var(--tan-ink);background:var(--tan);
+  padding:6px 13px;border-radius:20px;box-shadow:0 2px 0 rgba(150,100,40,.12)}
+.slotchip.on{background:var(--gold);color:var(--wood);box-shadow:0 0 0 2px var(--gold-d)}
+.slotchip:disabled{cursor:default}
+.slottail{font-weight:700;font-size:16px;color:var(--ink-hi)}
+.slotans{font-weight:700;font-size:13.5px;color:var(--green-ink)}
+
+/* คำใบ้เป็นชั้น */
+.pzhints{margin-top:14px}
+.pzhintnote{text-align:center;font-size:13px;color:var(--muted);margin-bottom:9px}
+.pzhintnote b{color:var(--gold-ink)}
+.pzhintbtn{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;
+  border:1.5px dashed #D9C08A;background:#FBF1D8;color:#9A6E2E;border-radius:11px;padding:10px 13px;
+  font-weight:700;font-size:14.5px;cursor:pointer;font-family:inherit;margin-bottom:8px}
+.pzhintxp{font-size:12px;color:var(--gold-ink);font-weight:800}
+.pzhinttext{background:var(--blue);border-radius:11px;padding:10px 13px;font-size:14.5px;line-height:1.55;
+  color:#3E6B7E;margin-bottom:8px;box-shadow:0 0 0 1.5px var(--blue-ring)}
+.pzhinttext b{color:var(--blue-ink)}
+.pzgiveup{width:100%;border:0;background:var(--tan);color:var(--tan-ink);font-weight:700;font-size:14px;
+  padding:10px;border-radius:11px;cursor:pointer;font-family:inherit;margin-top:2px}
+
+/* วิธีทำ */
+.pzsol{margin-top:14px;background:var(--card);border:2px solid var(--line-2);border-radius:15px;
+  overflow:hidden;box-shadow:var(--lift-1)}
+.pzsolh{background:var(--green-pale);color:var(--green-ink);font-weight:800;font-size:15.5px;padding:10px 14px}
+.pzsolc{padding:12px 15px;font-size:15.5px;line-height:1.65}
+.pzsolc b{color:var(--green-ink)}
+
 /* ── นำทาง ── */
 .nav{display:flex;gap:9px;margin-top:16px}
 .nav .btn{flex:1}

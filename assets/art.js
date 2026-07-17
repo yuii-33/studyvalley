@@ -141,4 +141,42 @@ const ART = {
     <path d="M32 12 54 30v22a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V30z" fill="${C.gold}" stroke="${C.gold_x}"/>
     <path d="M8 32 32 13 56 32" stroke="${C.wood_d}" stroke-width="3"/>
     <path d="M26 54V38h12v16z" fill="${C.wood}"/>`, s),
+
+  /* ── ปริศนาเชาวน์ ── */
+  bridge: s => svg(`
+    <path d="M8 30c8 8 40 8 48 0" fill="none" stroke="${C.wood_d}" stroke-width="3"/>
+    <path d="M8 30v18M20 33v15M32 34v14M44 33v15M56 30v18" stroke="${C.wood}" stroke-width="3"/>
+    <path d="M8 48h48" stroke="${C.wood_d}" stroke-width="3.5"/>`, s),
+
+  scale: s => svg(`
+    <path d="M32 12v34" stroke="${C.wood_d}" stroke-width="3"/>
+    <path d="M14 20h36" stroke="${C.gold_x}" stroke-width="3"/>
+    <path d="M14 20 8 34a6 6 0 0 0 12 0z" fill="${C.gold}" stroke="${C.gold_x}"/>
+    <path d="M50 20 44 34a6 6 0 0 0 12 0z" fill="${C.gold}" stroke="${C.gold_x}"/>
+    <path d="M22 52h20" stroke="${C.wood_d}" stroke-width="3.5"/>
+    <circle cx="32" cy="14" r="3" fill="${C.gold_d}" stroke="none"/>`, s),
+
+  bucket: s => svg(`
+    <path d="M14 22h36l-4 30a3 3 0 0 1-3 3H21a3 3 0 0 1-3-3z" fill="${C.blue}" stroke="${C.blue_d}"/>
+    <path d="M14 22c0-4 36-4 36 0" fill="none" stroke="${C.blue_d}" stroke-width="2.5"/>
+    <path d="M16 38c6-4 26-4 32 0l-1.5 12c-9-4-20-4-29 0z" fill="${C.blue_d}" stroke="none" opacity="0.55"/>`, s),
+
+  chart: s => svg(`
+    <path d="M12 52V16h9v36zM27 52V26h9v26zM42 52V34h9v18z" fill="${C.green}" stroke="${C.green_d}"/>
+    <path d="M10 54h46" stroke="${C.wood_d}" stroke-width="3"/>`, s),
+
+  target: s => svg(`
+    <circle cx="32" cy="32" r="21" fill="${C.rose}" stroke="${C.rose_d}"/>
+    <circle cx="32" cy="32" r="13" fill="${C.paper}" stroke="${C.rose_d}"/>
+    <circle cx="32" cy="32" r="5" fill="${C.rose_d}" stroke="none"/>`, s),
+
+  triangle: s => svg(`
+    <path d="M32 12 54 50H10z" fill="${C.gold}" stroke="${C.gold_x}"/>
+    <path d="M32 31 43 50H21z" fill="${C.gold_d}" stroke="${C.gold_x}"/>`, s),
+
+  boat: s => svg(`
+    <path d="M14 40h36l-5 12a3 3 0 0 1-3 2H22a3 3 0 0 1-3-2z" fill="${C.wood}" stroke="${C.wood_d}"/>
+    <path d="M32 12v26" stroke="${C.wood_d}" stroke-width="2.6"/>
+    <path d="M32 14h16l-16 12z" fill="${C.rose}" stroke="${C.rose_d}"/>
+    <path d="M10 56c6 3 10-3 16 0s10 3 16 0 8 3 12 0" fill="none" stroke="${C.blue_d}" stroke-width="2.4"/>`, s),
 };

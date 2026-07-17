@@ -39,11 +39,16 @@ const roomQuery = id => '?' + (ROOM !== 'posn' ? 'room=' + ROOM + '&' : '') + 'i
 const SCHEMA = 1;
 const keyOf = id => 'sv.' + ROOM + '.' + id;   // posn → sv.posn.<id> (เหมือนเดิม) · logic → sv.logic.<id>
 
+/* ถูกไหม : logic เก็บผลไว้ที่ a.correct · posn เทียบ pick กับ c */
+function isCorrect(a, q){
+  return a.correct !== undefined ? a.correct : (a.pick != null && eqAns(a.pick, q.c));
+}
+const XP_BY_HINTS = [25, 15, 10, 0];   // ไม่ใบ้ 25 · ใบ้ 1 = 15 · 2 = 10 · 3ชั้น/ยอมแพ้ = 0
 function computeStat(){
   let answered = 0, correct = 0, done = 0;
   SET.questions.forEach((q, i) => {
     const a = ans[i];
-    if(a.revealed){ done++; answered++; if(a.pick != null && eqAns(a.pick, q.c)) correct++; }
+    if(a.revealed){ done++; answered++; if(isCorrect(a, q)) correct++; }
   });
   return { n:SET.n, answered, correct, done };
 }
@@ -243,6 +248,7 @@ function doneCount(id, n){
 
 /* ── เรนเดอร์ข้อ ── */
 function renderQuestion(){
+  if(ROOM === 'logic') return renderPuzzle();
   const q = SET.questions[cur], a = ans[cur];
 
   $('qprogfill').style.width = ((cur+1)/SET.n*100) + '%';
@@ -346,7 +352,7 @@ function showSummary(){
   SET.questions.forEach((q, i) => {
     const a = ans[i];
     if(!a.revealed){ skipped.push(i+1); return; }
-    if(a.pick != null && eqAns(a.pick, q.c)) correct++;
+    if(isCorrect(a, q)) correct++;
     else wrong.push(i+1);
   });
 
@@ -386,6 +392,136 @@ function showSummary(){
       + '<a class="btn primary" href="../index.html" style="flex:1;text-align:center">หน้าแรก</a>'
     + '</div>';
   $('btnReview').onclick = () => { cur = 0; $('summary').style.display = 'none'; $('quiz').style.display = ''; renderQuestion(); startTimer(); };
+  window.scrollTo(0, 0);
+}
+
+/* ══════════════════════════════════════════════════════════
+   ห้องปริศนา (logic) : ตอบเอง/เลือกช่อง · คำใบ้เป็นชั้น (ยิ่งใบ้ XP น้อยลง) · ยอมแพ้ดูวิธี
+   ══════════════════════════════════════════════════════════ */
+/* ตัดหน่วย/ช่องว่าง/จุลภาค ตอนตรวจคำตอบปริศนา ("17 นาที" = "17") */
+const PZ_UNIT = /(นาที|ครั้ง|กรัม|เม็ด|รูป|เที่ยว|ขั้น|ลิตร|ดวง|คน)/g;
+const pzNorm = s => String(s == null ? '' : s).trim().toLowerCase().replace(/[\s,]+/g, '').replace(PZ_UNIT, '');
+function slotsAllRight(q, a){
+  return (a.slots || []).length === q.rows.length &&
+    q.rows.every((r, i) => a.slots[i] && eqAns(a.slots[i], r.c));
+}
+function pzXP(a){ return XP_BY_HINTS[Math.min(a.hintsOpen || 0, 3)]; }
+
+function solvePuzzle(){
+  const q = SET.questions[cur], a = ans[cur];
+  if(a.revealed) return;
+  a.revealed = true; a.correct = true;
+  if(typeof XP !== 'undefined') XP.award('g:'+SET.id+':'+cur, pzXP(a));
+  save(); renderPuzzle();
+}
+function giveUpPuzzle(){
+  const a = ans[cur];
+  if(a.revealed) return;
+  a.revealed = true; a.correct = false; a.gaveup = true;
+  save(); renderPuzzle();
+}
+function checkPuzzle(){
+  const q = SET.questions[cur], a = ans[cur];
+  if(a.revealed) return;
+  const right = q.type === 'slots' ? slotsAllRight(q, a) : (a.val != null && pzNorm(a.val) !== '' && pzNorm(a.val) === pzNorm(q.c));
+  if(right){ solvePuzzle(); }
+  else { a.tried = true; renderPuzzle(); }
+}
+function openHint(k){
+  const a = ans[cur];
+  if(a.revealed || k !== (a.hintsOpen || 0)) return;   // เปิดตามลำดับ
+  a.hintsOpen = k + 1; save(); renderPuzzle();
+}
+
+function renderPuzzle(){
+  const q = SET.questions[cur], a = ans[cur];
+  a.hintsOpen = a.hintsOpen || 0;
+
+  $('qprogfill').style.width = ((cur+1)/SET.n*100) + '%';
+  $('qcount').textContent = 'ข้อ ' + (cur+1) + ' / ' + SET.n;
+  $('qtarget').textContent = '';
+
+  /* ป้าย: ไอคอน + ดาวความยาก */
+  let stars = ''; for(let k=0;k<(q.diff||1);k++) stars += ART.star(16);
+  $('badges').innerHTML = '<span class="pzicon">' + ART[q.icon || 'grid'](30) + '</span>'
+    + '<span class="pzstars">' + stars + '</span>';
+  $('qbody').innerHTML = norm(q.q);
+
+  /* ซ่อนคอนโทรลของ posn */
+  ['hintbtn','trbox','choices','fillwrap','pauseBtn'].forEach(id => $(id).style.display = 'none');
+  document.querySelector('.actions').style.display = 'none';
+  $('exbox').style.display = 'none';
+
+  const done = a.revealed, solved = done && a.correct;
+  const P = $('puzzle'); P.style.display = '';
+  let h = '';
+
+  /* โซนคำตอบ */
+  if(q.type === 'slots'){
+    h += '<div class="slotwrap">' + q.rows.map((r, i) => {
+      const picked = a.slots && a.slots[i];
+      const ok = done && picked && eqAns(picked, r.c);
+      const chips = q.options.map(o =>
+        '<button class="slotchip' + (picked===o?' on':'') + '" data-row="'+i+'" data-opt="'+o+'"'
+        + (done?' disabled':'') + '>' + o + '</button>').join('');
+      return '<div class="slotrow' + (done ? (ok?' ok':' no') : '') + '">'
+        + '<div class="slotchips">' + chips + '</div>'
+        + '<div class="slottail">' + r.tail + (done && !ok ? ' <span class="slotans">(' + r.c + ')</span>' : '') + '</div>'
+      + '</div>';
+    }).join('') + '</div>';
+  } else {
+    h += '<div class="pzfill"><input class="field" id="pzinput" autocomplete="off" '
+      + (done?'disabled':'') + ' placeholder="ตอบ' + (q.unit ? ' (' + q.unit + ')' : '') + '" '
+      + 'value="' + (a.val != null ? String(a.val).replace(/"/g,'&quot;') : '') + '"></div>';
+  }
+
+  /* ผล + ปุ่มตอบ */
+  if(!done){
+    h += '<button class="btn primary pzcheck" id="pzCheck">ตอบ</button>';
+    if(a.tried) h += '<div class="pzresult no">ยังไม่ใช่ • ลองใหม่ หรือเปิดคำใบ้</div>';
+  } else {
+    h += solved
+      ? '<div class="pzresult ok">' + ART.sure(20) + '<span>ถูกต้อง • +' + pzXP(a) + ' XP</span></div>'
+      : '<div class="pzresult no">' + ART.book(20) + '<span>' + (a.gaveup ? 'ดูวิธีทำด้านล่าง แล้วลองข้อใหม่' : 'ยังไม่ใช่') + '</span></div>';
+  }
+
+  /* คำใบ้เป็นชั้น */
+  if(!done){
+    h += '<div class="pzhints">';
+    h += '<div class="pzhintnote">ตอบเองตอนนี้ได้ <b>' + pzXP(a) + ' XP</b> • ยิ่งเปิดคำใบ้ ยิ่งได้น้อยลง</div>';
+    for(let k=0;k<3;k++){
+      if(k < a.hintsOpen){
+        h += '<div class="pzhinttext"><b>คำใบ้ ' + (k+1) + '</b> ' + norm(q.hints[k]) + '</div>';
+      } else if(k === a.hintsOpen){
+        h += '<button class="pzhintbtn" data-hint="'+k+'">เปิดคำใบ้ ' + (k+1) + ' <span class="pzhintxp">เหลือ ' + XP_BY_HINTS[Math.min(k+1,3)] + ' XP</span></button>';
+      }
+    }
+    h += '<button class="pzgiveup" id="pzGiveup">ยอมแพ้ • ดูวิธีทำ</button>';
+    h += '</div>';
+  }
+
+  /* วิธีทำ (หลังตอบถูก/ยอมแพ้) */
+  if(done){
+    h += '<div class="pzsol"><div class="pzsolh">วิธีทำ</div><div class="pzsolc">' + norm(q.ex) + '</div></div>';
+  }
+  P.innerHTML = h;
+
+  /* ผูกปุ่ม */
+  if(q.type === 'slots'){
+    P.querySelectorAll('[data-row]').forEach(b => b.onclick = () => {
+      a.slots = a.slots || []; a.slots[+b.dataset.row] = b.dataset.opt; a.tried = false; save(); renderPuzzle();
+    });
+  } else {
+    const inp = $('pzinput');
+    if(inp && !done){ inp.oninput = e => { a.val = e.target.value; a.tried = false; };
+      inp.onkeydown = e => { if(e.key === 'Enter') checkPuzzle(); }; }
+  }
+  if($('pzCheck')) $('pzCheck').onclick = checkPuzzle;
+  if($('pzGiveup')) $('pzGiveup').onclick = giveUpPuzzle;
+  P.querySelectorAll('[data-hint]').forEach(b => b.onclick = () => openHint(+b.dataset.hint));
+
+  $('btnPrev').disabled = cur === 0;
+  $('btnNext').textContent = cur === SET.n-1 ? 'ดูสรุปผล' : 'ถัดไป';
   window.scrollTo(0, 0);
 }
 
