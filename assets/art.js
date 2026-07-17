@@ -179,4 +179,61 @@ const ART = {
     <path d="M32 12v26" stroke="${C.wood_d}" stroke-width="2.6"/>
     <path d="M32 14h16l-16 12z" fill="${C.rose}" stroke="${C.rose_d}"/>
     <path d="M10 56c6 3 10-3 16 0s10 3 16 0 8 3 12 0" fill="none" stroke="${C.blue_d}" stroke-width="2.4"/>`, s),
+
+  clock: s => svg(`
+    <circle cx="32" cy="32" r="21" fill="${C.cream}" stroke="${C.wood_d}"/>
+    <path d="M32 32V19M32 32l9 6" stroke="${C.ink}" stroke-width="3"/>
+    <circle cx="32" cy="32" r="2.6" fill="${C.wood_d}" stroke="none"/>
+    <path d="M32 12v3M52 32h-3M32 52v-3M12 32h3" stroke="${C.wood_d}" stroke-width="2"/>`, s),
+
+  graph: s => svg(`
+    <path d="M18 22 46 22 32 48zM18 22 32 48M46 22 32 48" stroke="${C.blue_d}" stroke-width="2.4" fill="none"/>
+    <circle cx="18" cy="22" r="6.5" fill="${C.rose}" stroke="${C.rose_d}"/>
+    <circle cx="46" cy="22" r="6.5" fill="${C.gold}" stroke="${C.gold_x}"/>
+    <circle cx="32" cy="48" r="6.5" fill="${C.green}" stroke="${C.green_d}"/>`, s),
+
+  frog: s => svg(`
+    <path d="M14 44c0-11 8-19 18-19s18 8 18 19c0 5-4 8-9 8H23c-5 0-9-3-9-8z" fill="${C.green}" stroke="${C.green_d}"/>
+    <circle cx="23" cy="24" r="7" fill="${C.green}" stroke="${C.green_d}"/>
+    <circle cx="41" cy="24" r="7" fill="${C.green}" stroke="${C.green_d}"/>
+    <circle cx="23" cy="24" r="3" fill="${C.ink}" stroke="none"/>
+    <circle cx="41" cy="24" r="3" fill="${C.ink}" stroke="none"/>
+    <path d="M26 45c3 2.5 9 2.5 12 0" stroke="${C.green_d}" stroke-width="2.4"/>`, s),
+
+  fire: s => svg(`
+    <path d="M33 8c7 9 3 14 8 19 2-2 2-5 2-5 4 5 5 11 5 15 0 10-8 16-16 16s-16-6-16-16c0-7 5-12 8-17 1 3 3 5 6 5-3-6-2-12 3-17z" fill="${C.red}" stroke="${C.rose_d}"/>
+    <path d="M32 30c3 4 5 7 5 11 0 4-2 7-5 7s-5-3-5-7c0-3 2-6 5-11z" fill="${C.gold}" stroke="none"/>`, s),
+
+  saw: s => svg(`
+    <path d="M8 30h38v10H8z" fill="${C.line}" stroke="${C.wood_d}"/>
+    <path d="M8 40l3 5 3-5 3 5 3-5 3 5 3-5 3 5 3-5 3 5 3-5 3 5 3-5" fill="none" stroke="${C.wood_d}" stroke-width="1.8"/>
+    <path d="M46 28h5a7 7 0 0 1 0 14h-5z" fill="${C.wood}" stroke="${C.wood_d}"/>
+    <ellipse cx="50" cy="35" rx="2.4" ry="4" fill="${C.line}" stroke="${C.wood_d}"/>`, s),
+
+  shield: s => svg(`
+    <path d="M32 10 50 16v13c0 13-8 21-18 25-10-4-18-12-18-25V16z" fill="${C.blue}" stroke="${C.blue_d}"/>
+    <path d="M32 20v22M22 29h20" stroke="${C.blue_d}" stroke-width="3"/>`, s),
+
+  dice: s => svg(`
+    <rect x="14" y="14" width="36" height="36" rx="8" fill="${C.paper}" stroke="${C.wood_d}"/>
+    <circle cx="24" cy="24" r="3.2" fill="${C.rose_d}" stroke="none"/>
+    <circle cx="40" cy="24" r="3.2" fill="${C.rose_d}" stroke="none"/>
+    <circle cx="32" cy="32" r="3.2" fill="${C.rose_d}" stroke="none"/>
+    <circle cx="24" cy="40" r="3.2" fill="${C.rose_d}" stroke="none"/>
+    <circle cx="40" cy="40" r="3.2" fill="${C.rose_d}" stroke="none"/>`, s),
+
+  calendar: s => svg(`
+    <rect x="12" y="16" width="40" height="36" rx="6" fill="${C.paper}" stroke="${C.wood_d}"/>
+    <path d="M12 27h40" stroke="${C.wood_d}" stroke-width="2.5"/>
+    <path d="M22 12v8M42 12v8" stroke="${C.rose_d}" stroke-width="3"/>
+    <path d="M20 35h7M31 35h7M20 43h7M31 43h7" stroke="${C.blue_d}" stroke-width="2.4"/>`, s),
+
+  coin: s => svg(`
+    <circle cx="32" cy="32" r="20" fill="${C.gold}" stroke="${C.gold_x}"/>
+    <circle cx="32" cy="32" r="13" fill="none" stroke="${C.gold_x}" stroke-width="2"/>
+    <path d="M32 22v20M28 27c2-2 6-2 8 0M28 37c2 2 6 2 8 0" stroke="${C.gold_ink}" stroke-width="2.4"/>`, s),
+
+  stairs: s => svg(`
+    <path d="M12 52V40h13V28h13V16h13v36z" fill="${C.gold}" stroke="${C.gold_x}"/>
+    <path d="M12 40h13V28h13V16" fill="none" stroke="${C.gold_x}" stroke-width="2"/>`, s),
 };
