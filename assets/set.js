@@ -559,16 +559,27 @@ function paperClockOn(){        // รีเฟรชตัวเลขบนจ
 }
 function paperClockOff(){ if(paperH){ clearInterval(paperH); paperH = null; } }
 
-function startPaper(){ paper = newPaper(); paper.startedAt = Date.now(); save(); renderPaper(); }
-function pausePaper(){ if(paper.pauseAt || paper.doneAt) return; paper.pauseAt = Date.now(); save(); renderPaper(); }
+let pendingCancel = false;
+
+function startPaper(){ paper = newPaper(); paper.startedAt = Date.now(); pendingCancel = false; save(); renderPaper(); }
+function pausePaper(){ if(paper.pauseAt || paper.doneAt) return; paper.pauseAt = Date.now(); pendingCancel = false; save(); renderPaper(); }
 function resumePaper(){
   if(!paper.pauseAt) return;
-  paper.pausedMs += Date.now() - paper.pauseAt; paper.pauseAt = null; save(); renderPaper();
+  paper.pausedMs += Date.now() - paper.pauseAt; paper.pauseAt = null;
+  pendingCancel = false; save(); renderPaper();
 }
 function donePaper(){
   if(paper.doneAt) return;
   if(paper.pauseAt){ paper.pausedMs += Date.now() - paper.pauseAt; paper.pauseAt = null; }
-  paper.doneAt = Date.now(); save(); renderPaper();
+  paper.doneAt = Date.now(); pendingCancel = false; save(); renderPaper();
+}
+/* เผลอกดเริ่มจับเวลา → ล้างรอบนี้ทิ้ง กลับไปหน้าเริ่ม (ยืนยัน 2 ครั้ง เพราะเวลาที่จับมาจะหาย) */
+function cancelPaper(){
+  if(!pendingCancel){ pendingCancel = true; renderPaper(); return; }
+  pendingCancel = false;
+  ans = SET.questions.map(() => ({ pick:null, revealed:false }));
+  paper = newPaper();
+  save(); renderPaper(); window.scrollTo(0, 0);
 }
 
 function paperScreen(){         // ซ่อนจอโหมดอื่น ให้เหลือ #paper
@@ -632,6 +643,11 @@ function renderPaper(){
           : '<div class="pnote">ทำในกระดาษได้เลย • ปิดจอ/สลับแอปได้ เวลาไม่หยุด</div>'
             + '<button class="btn soft pbig" id="pPause">ขอพัก</button>')
       +   '<button class="btn primary pbig" id="pDone">ทำเสร็จแล้ว</button>'
+      +   (pendingCancel
+          ? '<div class="pwarn">ยกเลิกแล้ว เวลาที่จับมา ' + mmss(paperSec()) + ' จะหายไป'
+            + '<br>กด "ยกเลิกรอบนี้" อีกครั้งถ้าจะยกเลิกจริง</div>'
+          : '')
+      +   '<button class="btn soft pbig preset" id="pCancel">ยกเลิกรอบนี้</button>'
       + '</div>';
   } else {
     h = renderSheet();          // ทำเสร็จแล้ว → กระดาษคำตอบ (ติ๊ก → ตรวจ → เฉลย)
@@ -642,6 +658,7 @@ function renderPaper(){
   if($('pPause'))  $('pPause').onclick  = pausePaper;
   if($('pResume')) $('pResume').onclick = resumePaper;
   if($('pDone'))   $('pDone').onclick   = donePaper;
+  if($('pCancel')) $('pCancel').onclick = cancelPaper;
   if($('pGrade'))  $('pGrade').onclick  = gradePaper;
   if($('pReset'))  $('pReset').onclick  = resetPaper;
   if($('pBackMode'))  $('pBackMode').onclick  = () => { MODE = null; save(); renderModePick(); };
