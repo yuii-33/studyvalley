@@ -189,6 +189,19 @@
 .pzsolc{padding:12px 15px;font-size:15.5px;line-height:1.65}
 .pzsolc b{color:var(--green-ink)}
 
+/* ── โหมดกระดาษ ── */
+.pcard{background:var(--card);border-radius:16px;padding:21px 17px 18px;box-shadow:var(--lift-1);text-align:center}
+.pcard .ph{font-size:19px;font-weight:800;color:var(--ink-hi)}
+.pcard .psub{margin-top:5px;font-size:15px;color:var(--muted)}
+.psteps{margin:15px 0 6px;padding-left:21px;text-align:left;font-size:15.5px;line-height:1.75;color:var(--ink)}
+.psteps li{margin-bottom:7px}
+.psteps b{color:var(--ink-hi)}
+.pnote{margin:8px 2px 3px;font-size:14.5px;color:var(--muted);line-height:1.55}
+.pbig{width:100%;margin-top:12px;font-size:17px;padding:14px}
+.pclock{font-size:54px;font-weight:800;color:var(--ink-hi);margin:8px 0 2px;
+  font-variant-numeric:tabular-nums;letter-spacing:1px}
+.ppaused{margin:11px 0 1px;font-weight:800;color:var(--gold-ink)}
+
 /* ── นำทาง ── */
 .nav{display:flex;gap:9px;margin-top:16px}
 .nav .btn{flex:1}

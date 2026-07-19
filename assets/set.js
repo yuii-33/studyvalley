@@ -27,6 +27,8 @@ let SET = null;        // ข้อมูลชุด { id, n, targetMin, questi
 let META = null;       // แถวจาก index.json ของชุดนี้
 let ans = [];          // สถานะต่อข้อ { pick, revealed }
 let cur = 0;           // ข้อปัจจุบัน (0-based)
+let MODE = null;       // 'drill' = ทีละข้อเฉลยได้ · 'paper' = ทำในกระดาษแล้วมาติ๊ก (เฉพาะชุดที่ตั้ง paper:true)
+let paper = null;      // { startedAt, pausedMs, pauseAt, doneAt } — เวลาเก็บเป็น timestamp ล้วน
 
 /* ── ห้อง (room) : แบบฝึก สอวน. = posn · ปัญหาเชาวน์ = logic ── */
 const ROOM = new URLSearchParams(location.search).get('room') === 'logic' ? 'logic' : 'posn';
@@ -53,7 +55,7 @@ function computeStat(){
   });
   return { n:SET.n, answered, correct, done };
 }
-const snapshot = () => ({ v:SCHEMA, id:SET.id, n:SET.n, cur, ans, elapsed, stat:computeStat(), t:Date.now() });
+const snapshot = () => ({ v:SCHEMA, id:SET.id, n:SET.n, cur, ans, elapsed, mode:MODE, paper, stat:computeStat(), t:Date.now() });
 const EXPIRE = 18*3600*1000;   // ค้างเกิน 18 ชม. = ล้าง ทำใหม่
 function validSaved(d){
   return d && d.v === SCHEMA && d.id === SET.id && d.n === SET.n
@@ -115,13 +117,16 @@ function tick(){
   elapsed += 1; renderTimer();
   if(elapsed % 5 === 0) save();
 }
-document.addEventListener('visibilitychange', () => { document.hidden ? stopTimer() : syncTimer(); });
+document.addEventListener('visibilitychange', () => {
+  if(MODE === 'paper'){ if(!document.hidden) renderPaper(); return; }   // โหมดกระดาษ: เวลาเดินต่อ แค่รีเฟรชจอตอนกลับมา
+  document.hidden ? stopTimer() : syncTimer();
+});
 window.addEventListener('pagehide', stopTimer);
 window.addEventListener('blur', stopTimer);
 window.addEventListener('focus', syncTimer);
 /* เดินเวลาเฉพาะตอน: อยู่ในโหมดทำโจทย์ · ข้อยังไม่เฉลย · ไม่พักเบรค · ไม่สลับแอป */
 function timerShouldRun(){
-  return ROOMCFG.timer && SET && $('quiz').style.display !== 'none' && $('summary').style.display === 'none'
+  return ROOMCFG.timer && SET && MODE !== 'paper' && $('quiz').style.display !== 'none' && $('summary').style.display === 'none'
       && !document.hidden && !manualPaused && ans[cur] && !ans[cur].revealed;
 }
 function syncTimer(){ if(timerShouldRun()) startTimer(); else stopTimer(); }
@@ -156,18 +161,31 @@ async function boot(){
   ans = SET.questions.map(() => ({ pick:null, revealed:false }));
   cur = 0; elapsed = 0;
 
-  const saved = await idbLoad(keyOf(id)) || loadLocal(id);
+  /* IDB เขียนแบบหน่วง 300ms ส่วน localStorage เขียนทันที → ถ้าปิดแอปเร็ว IDB จะเก่ากว่า
+     เลยต้องเทียบ t แล้วเอาอันที่ใหม่กว่า (ไม่งั้นของเก่าทับของใหม่) */
+  const fromIdb = await idbLoad(keyOf(id)), fromLs = loadLocal(id);
+  const saved = (fromIdb && fromLs) ? ((fromIdb.t || 0) >= (fromLs.t || 0) ? fromIdb : fromLs)
+                                    : (fromIdb || fromLs);
   if(validSaved(saved) && (Date.now() - (saved.t||0)) <= EXPIRE){
     ans = saved.ans; cur = Math.min(saved.cur||0, SET.n-1); elapsed = saved.elapsed||0;   // ทำต่อจากเดิม
+    MODE = saved.mode || null; paper = saved.paper || null;
   } else if(saved){
     try{ localStorage.removeItem(keyOf(id)); }catch(e){}   // ค้างข้ามวัน/เกิน 18 ชม. → ล้าง เริ่มใหม่
   }
 
   $('settitle').textContent = META ? META.title : id;
-  $('timer').style.display = ROOMCFG.timer ? '' : 'none';   // ปัญหาเชาวน์ไม่จับเวลา
   $('picker').style.display = 'none';
-  $('quiz').style.display = '';
   bindActions();
+
+  /* ชุดที่เปิดโหมดกระดาษ: ให้เลือกโหมดก่อน (จำโหมดที่เลือกไว้ตอนทำต่อ) */
+  if(META && META.paper && MODE !== 'drill'){
+    if(!MODE) return renderModePick();
+    paper = paper || newPaper();
+    return renderPaper();
+  }
+  MODE = MODE || 'drill';
+  $('timer').style.display = ROOMCFG.timer ? '' : 'none';   // ปัญหาเชาวน์ไม่จับเวลา
+  $('quiz').style.display = '';
   renderQuestion();   // renderQuestion เรียก syncTimer เอง
 }
 
@@ -524,6 +542,115 @@ function renderPuzzle(){
   $('btnPrev').disabled = cur === 0;
   $('btnNext').textContent = cur === SET.n-1 ? 'ดูสรุปผล' : 'ถัดไป';
   window.scrollTo(0, 0);
+}
+
+/* ══════════════════════════════════════════════════════════
+   โหมดกระดาษ — ทำข้อสอบในกระดาษ/PDF · แอปจับเวลา แล้วมาติ๊กคำตอบ
+   นาฬิกาคำนวณจาก timestamp ทุกครั้ง (ไม่สะสมทีละวินาที)
+   → เดินต่อแม้จอดับ / สลับแอป / ปิดแอปแล้วเปิดใหม่
+   ══════════════════════════════════════════════════════════ */
+const newPaper = () => ({ startedAt:0, pausedMs:0, pauseAt:null, doneAt:null });
+
+function paperMs(){
+  const p = paper; if(!p || !p.startedAt) return 0;
+  const end = p.doneAt || p.pauseAt || Date.now();   // จบแล้ว/พักอยู่ = หยุดนิ่ง
+  return Math.max(0, end - p.startedAt - p.pausedMs);
+}
+const paperSec = () => Math.floor(paperMs() / 1000);
+
+let paperH = null;
+function paperClockOn(){        // รีเฟรชตัวเลขบนจอเฉย ๆ — ไม่ได้เป็นตัวนับเวลา
+  paperClockOff();
+  paperH = setInterval(() => {
+    const el = $('paperClock'); if(el) el.textContent = mmss(paperSec());
+  }, 1000);
+}
+function paperClockOff(){ if(paperH){ clearInterval(paperH); paperH = null; } }
+
+function startPaper(){ paper = newPaper(); paper.startedAt = Date.now(); save(); renderPaper(); }
+function pausePaper(){ if(paper.pauseAt || paper.doneAt) return; paper.pauseAt = Date.now(); save(); renderPaper(); }
+function resumePaper(){
+  if(!paper.pauseAt) return;
+  paper.pausedMs += Date.now() - paper.pauseAt; paper.pauseAt = null; save(); renderPaper();
+}
+function donePaper(){
+  if(paper.doneAt) return;
+  if(paper.pauseAt){ paper.pausedMs += Date.now() - paper.pauseAt; paper.pauseAt = null; }
+  paper.doneAt = Date.now(); save(); renderPaper();
+}
+
+function paperScreen(){         // ซ่อนจอโหมดอื่น ให้เหลือ #paper
+  ['picker','quiz','summary'].forEach(id => $(id).style.display = 'none');
+  $('timer').style.display = 'none';       // โหมดนี้ใช้นาฬิกาของตัวเอง
+  stopTimer();
+  const P = $('paper'); P.style.display = '';
+  return P;
+}
+
+function renderModePick(){
+  const P = paperScreen();
+  P.innerHTML =
+      '<div class="pcard">'
+    +   '<div class="ph">เลือกวิธีทำชุดนี้</div>'
+    +   '<div class="psub">' + SET.n + ' ข้อ • เป้า ' + SET.targetMin + ' นาที</div>'
+    +   '<button class="btn primary pbig" id="mPaper">โหมดกระดาษ • จับเวลาเหมือนสอบ</button>'
+    +   '<div class="pnote">ทำในกระดาษ/PDF จนครบ แล้วมาติ๊กคำตอบในแอป ค่อยดูเฉลย</div>'
+    +   '<button class="btn soft pbig" id="mDrill">ฝึกทีละข้อ</button>'
+    +   '<div class="pnote">ทำทีละข้อ กดดูเฉลยได้ทันที</div>'
+    + '</div>';
+  $('mPaper').onclick = () => { MODE = 'paper'; paper = paper || newPaper(); save(); renderPaper(); };
+  $('mDrill').onclick = () => {
+    MODE = 'drill'; save();
+    $('paper').style.display = 'none';
+    $('timer').style.display = ROOMCFG.timer ? '' : 'none';
+    $('quiz').style.display = '';
+    renderQuestion();
+  };
+}
+
+function renderPaper(){
+  const P = paperScreen();
+  const started = !!paper.startedAt, done = !!paper.doneAt, paused = !!paper.pauseAt;
+  let h = '';
+
+  if(!started){
+    h = '<div class="pcard">'
+      +   '<div class="ph">โหมดกระดาษ</div>'
+      +   '<div class="psub">' + SET.n + ' ข้อ • เป้า ' + SET.targetMin + ' นาที</div>'
+      +   '<ol class="psteps">'
+      +     '<li>เตรียมกระดาษ/ไอแพดให้พร้อม</li>'
+      +     '<li>กดเริ่มจับเวลา แล้วลงมือได้เลย — <b>วางมือถือ ปิดจอได้ เวลายังเดินอยู่</b></li>'
+      +     '<li>ทำครบแล้วกด "ทำเสร็จแล้ว" เวลาจะหยุด ค่อยมาติ๊กคำตอบทีเดียว</li>'
+      +   '</ol>'
+      +   '<button class="btn primary pbig" id="pStart">เริ่มจับเวลา</button>'
+      + '</div>';
+  } else if(!done){
+    h = '<div class="pcard">'
+      +   '<div class="pclock" id="paperClock">' + mmss(paperSec()) + '</div>'
+      +   '<div class="psub">เป้า ' + SET.targetMin + ' นาที • ' + SET.n + ' ข้อ</div>'
+      +   (paused
+          ? '<div class="ppaused">พักอยู่ • เวลาหยุดแล้ว</div>'
+            + '<button class="btn primary pbig" id="pResume">ทำต่อ</button>'
+          : '<div class="pnote">ทำในกระดาษได้เลย • ปิดจอ/สลับแอปได้ เวลาไม่หยุด</div>'
+            + '<button class="btn soft pbig" id="pPause">ขอพัก</button>')
+      +   '<button class="btn primary pbig" id="pDone">ทำเสร็จแล้ว</button>'
+      + '</div>';
+  } else {
+    const sec = paperSec(), tgt = SET.targetMin * 60;
+    h = '<div class="pcard">'
+      +   '<div class="ph">ทำเสร็จแล้ว</div>'
+      +   '<div class="pclock">' + mmss(sec) + '</div>'
+      +   '<div class="psub">' + (sec <= tgt ? 'อยู่ในเป้า ' : 'เกินเป้า ') + SET.targetMin + ' นาที</div>'
+      + '</div>';
+  }
+  P.innerHTML = h;
+
+  if($('pStart'))  $('pStart').onclick  = startPaper;
+  if($('pPause'))  $('pPause').onclick  = pausePaper;
+  if($('pResume')) $('pResume').onclick = resumePaper;
+  if($('pDone'))   $('pDone').onclick   = donePaper;
+
+  if(started && !done && !paused) paperClockOn(); else paperClockOff();
 }
 
 boot();
