@@ -229,6 +229,17 @@
 .preset{margin-top:16px;font-size:15px;color:var(--muted)}
 .pback{float:left;margin:-4px 0 0 -3px;border:0;cursor:pointer;background:var(--tan);color:var(--wood-l);
   font-weight:700;font-size:13.5px;padding:5px 12px;border-radius:16px}
+/* ปุ่มเลือกข้อ (ห้อง logic) — กระโดดข้ามข้อ ไม่ต้องกดถัดไปทีละข้อ */
+.qnav{margin-top:16px}
+.qnavh{font-size:13.5px;font-weight:800;color:var(--muted);margin-bottom:8px}
+.qnavgrid{display:flex;flex-wrap:wrap;gap:7px}
+.qnavb{width:40px;height:40px;cursor:pointer;font-weight:700;font-size:15px;
+  background:var(--card);color:var(--ink);border:2px solid var(--line-2);border-radius:11px}
+.qnavb.ok{border-color:var(--green-x);background:var(--green-pale);color:var(--green-ink)}
+.qnavb.no{border-color:var(--rose-ring);background:var(--rose);color:var(--rose-ink)}
+.qnavb.on{border-color:var(--gold-d);background:var(--gold-pale);color:var(--gold-ink);
+  box-shadow:0 0 0 2px var(--gold-d)}
+
 /* แถบเตือนบนการ์ดในรายการชุด — มีรอบจับเวลาค้างอยู่ */
 .pickrun{margin-top:5px;display:inline-block;font-weight:800;font-size:13.5px;
   background:var(--gold-pale);color:var(--gold-ink);padding:3px 10px;border-radius:14px}

@@ -369,6 +369,7 @@ function renderQuestion(){
   $('btnPrev').disabled = cur === 0;
   $('btnNext').textContent = cur === SET.n-1 ? 'ดูสรุปผล' : 'ถัดไป';
 
+  renderExtra();
   syncTimer();          // เฉลย → พัก · ข้อใหม่ (play) → จับต่อออโต้
   window.scrollTo(0, 0);
 }
@@ -570,7 +571,53 @@ function renderPuzzle(){
 
   $('btnPrev').disabled = cur === 0;
   $('btnNext').textContent = cur === SET.n-1 ? 'ดูสรุปผล' : 'ถัดไป';
+  renderExtra();
   window.scrollTo(0, 0);
+}
+
+/* ── ท้ายหน้า: ปุ่มเลือกข้อ (ห้อง logic) / ยกเลิกโหมดทีละข้อ (ชุดโหมดกระดาษ) ── */
+let pendingSwitch = false;
+
+function renderExtra(){
+  const box = $('qextra');
+  let h = '';
+
+  /* ห้อง logic: กระโดดข้ามข้อได้เลย ไม่ต้องกดถัดไปทีละข้อ */
+  if(ROOM === 'logic'){
+    h += '<div class="qnav"><div class="qnavh">ไปข้อ</div><div class="qnavgrid">';
+    for(let i = 0; i < SET.n; i++){
+      const a = ans[i] || {};
+      const cls = i === cur ? ' on' : (a.revealed ? (a.correct ? ' ok' : ' no') : '');
+      h += '<button class="qnavb' + cls + '" data-go="' + i + '">' + (i+1) + '</button>';
+    }
+    h += '</div></div>';
+  }
+
+  /* ชุดโหมดกระดาษที่เลือกทำทีละข้อ: ถอยออกไปเลือกโหมดใหม่ได้ (เหมือน "ยกเลิกรอบนี้" ฝั่งกระดาษ) */
+  if(META && META.paper && MODE === 'drill'){
+    if(pendingSwitch){
+      h += '<div class="pwarn">ยกเลิกแล้ว คำตอบที่ทำไว้ในชุดนี้จะถูกล้าง'
+         + '<br>กด "ยกเลิก" อีกครั้งถ้าจะยกเลิกจริง</div>';
+    }
+    h += '<button class="btn soft pbig preset" id="qSwitch">ยกเลิก • กลับไปเลือกโหมด</button>';
+  }
+
+  box.innerHTML = h;
+  box.style.display = h ? '' : 'none';
+  box.querySelectorAll('[data-go]').forEach(b => b.onclick = () => {
+    cur = +b.dataset.go; save(); renderQuestion();
+  });
+  if($('qSwitch')) $('qSwitch').onclick = cancelDrill;
+}
+
+function cancelDrill(){
+  const prog = ans.filter(a => a.revealed || a.pick != null).length;
+  if(prog && !pendingSwitch){ pendingSwitch = true; renderExtra(); return; }
+  pendingSwitch = false;
+  ans = SET.questions.map(() => ({ pick:null, revealed:false }));
+  cur = 0; elapsed = 0; paper = newPaper(); MODE = null;
+  stopTimer(); save();
+  renderModePick();
 }
 
 /* ══════════════════════════════════════════════════════════
