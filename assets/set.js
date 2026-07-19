@@ -218,12 +218,17 @@ function renderPicker(index){
     const done = doneCount(s.id, s.n);
     const isNew = s.added && (Date.now() - s.added) < newWin && !done;   // เพิ่งเพิ่ม + ยังไม่เริ่ม
     const meta = ROOMCFG.timer ? (s.n + ' ข้อ • เป้า ' + s.targetMin + ' นาที') : (s.n + ' ข้อ');
+    const pst = s.paper ? paperState(s.id) : null;      // มีรอบที่ยังค้างอยู่มั้ย
     return '<a class="card row pickrow" href="' + roomQuery(s.id) + '">'
       + '<div class="tile">' + ART.book(26) + '</div>'
       + '<div style="flex:1;min-width:0">'
         + '<div class="picktitle">' + (isNew ? '<span class="newbadge">new</span> ' : '') + s.title + '</div>'
         + '<div class="pickmeta"><span class="chip ' + sj.c + '">' + sj.t + '</span>'
+          + (s.paper ? '<span class="chip blue">กระดาษ</span>' : '')
           + '<span class="pickn">' + meta + '</span></div>'
+        + (pst ? '<div class="pickrun' + (pst.done ? ' wait' : '') + '"'
+                 + (pst.done || pst.paused ? '' : ' data-ptick="' + s.id + '"')
+                 + '>' + paperLabel(pst) + '</div>' : '')
       + '</div>'
       + (done ? '<span class="chip green">ทำแล้ว ' + done + '/' + s.n + '</span>' : '')
       + '</a>';
@@ -250,11 +255,43 @@ function renderPicker(index){
       renderPicker(INDEX_CACHE); window.scrollTo(0,0);
     };
   });
+  if(box.querySelector('[data-ptick]')) pickTickOn(); else pickTickOff();
 }
 function doneCount(id, n){
   const d = loadLocal(id);
   if(!d || d.v !== SCHEMA || !Array.isArray(d.ans) || d.ans.length !== n) return 0;
   return d.ans.filter(a => a.revealed).length;
+}
+
+/* โหมดกระดาษ: อ่านสถานะจับเวลาของชุดนั้นจากที่เซฟไว้ เพื่อเตือนตั้งแต่ในรายการชุด
+   (กันเผลอเริ่มจับเวลาแล้วลืม — เดิมไม่มีอะไรบอกจนกว่าจะเปิดชุดเข้าไปดู) */
+function paperState(id){
+  const d = loadLocal(id);
+  if(!d || d.v !== SCHEMA || d.mode !== 'paper') return null;
+  const p = d.paper;
+  if(!p || !p.startedAt || p.gradedAt) return null;      // ยังไม่เริ่ม/ตรวจจบแล้ว = ไม่ต้องเตือน
+  const end = p.doneAt || p.pauseAt || Date.now();
+  return {
+    sec: Math.max(0, Math.floor((end - p.startedAt - p.pausedMs) / 1000)),
+    paused: !!p.pauseAt, done: !!p.doneAt,
+  };
+}
+const paperLabel = st => st.done ? 'รอติ๊กคำตอบ'
+  : (st.paused ? 'พักอยู่ ' : 'กำลังจับเวลา ') + mmss(st.sec);
+
+/* เดินนาฬิกาบนการ์ดให้ดูมีชีวิต — อัปเดตเฉพาะข้อความ ไม่ re-render ทั้งรายการ */
+let pickTickH = null;
+function pickTickOff(){ if(pickTickH){ clearInterval(pickTickH); pickTickH = null; } }
+function pickTickOn(){
+  pickTickOff();
+  pickTickH = setInterval(() => {
+    const live = document.querySelectorAll('[data-ptick]');
+    if(!live.length) return pickTickOff();
+    live.forEach(el => {
+      const st = paperState(el.dataset.ptick);
+      if(st) el.textContent = paperLabel(st); else el.removeAttribute('data-ptick');
+    });
+  }, 1000);
 }
 
 /* ── เรนเดอร์ข้อ ── */
@@ -559,19 +596,23 @@ function paperClockOn(){        // รีเฟรชตัวเลขบนจ
 }
 function paperClockOff(){ if(paperH){ clearInterval(paperH); paperH = null; } }
 
-let pendingCancel = false;
+let pendingCancel = false, pendingDone = false;
+const clearPending = () => { pendingCancel = false; pendingDone = false; };
 
-function startPaper(){ paper = newPaper(); paper.startedAt = Date.now(); pendingCancel = false; save(); renderPaper(); }
-function pausePaper(){ if(paper.pauseAt || paper.doneAt) return; paper.pauseAt = Date.now(); pendingCancel = false; save(); renderPaper(); }
+function startPaper(){ paper = newPaper(); paper.startedAt = Date.now(); clearPending(); save(); renderPaper(); }
+function pausePaper(){ if(paper.pauseAt || paper.doneAt) return; paper.pauseAt = Date.now(); clearPending(); save(); renderPaper(); }
 function resumePaper(){
   if(!paper.pauseAt) return;
   paper.pausedMs += Date.now() - paper.pauseAt; paper.pauseAt = null;
-  pendingCancel = false; save(); renderPaper();
+  clearPending(); save(); renderPaper();
 }
 function donePaper(){
   if(paper.doneAt) return;
+  /* เวลาเกินเป้าเกินเท่าตัว = น่าจะลืมกดทำเสร็จ ถามก่อนบันทึก กันสถิติเวลาเพี้ยน */
+  const tgt = (SET.targetMin || 0) * 60;
+  if(tgt && paperSec() > tgt * 2 && !pendingDone){ pendingCancel = false; pendingDone = true; renderPaper(); return; }
   if(paper.pauseAt){ paper.pausedMs += Date.now() - paper.pauseAt; paper.pauseAt = null; }
-  paper.doneAt = Date.now(); pendingCancel = false; save(); renderPaper();
+  paper.doneAt = Date.now(); clearPending(); save(); renderPaper();
 }
 /* เผลอกดเริ่มจับเวลา → ล้างรอบนี้ทิ้ง กลับไปหน้าเริ่ม (ยืนยัน 2 ครั้ง เพราะเวลาที่จับมาจะหาย) */
 function cancelPaper(){
@@ -643,6 +684,10 @@ function renderPaper(){
           : '<div class="pnote">ทำในกระดาษได้เลย • ปิดจอ/สลับแอปได้ เวลาไม่หยุด</div>'
             + '<button class="btn soft pbig" id="pPause">ขอพัก</button>')
       +   '<button class="btn primary pbig" id="pDone">ทำเสร็จแล้ว</button>'
+      +   (pendingDone
+          ? '<div class="pwarn">ใช้เวลา ' + mmss(paperSec()) + ' เกินเป้า ' + SET.targetMin + ' นาที ไปเยอะ'
+            + '<br>ลืมกด "ทำเสร็จแล้ว" ไว้รึเปล่า? กดอีกครั้งถ้าจะบันทึกเวลานี้จริง</div>'
+          : '')
       +   (pendingCancel
           ? '<div class="pwarn">ยกเลิกแล้ว เวลาที่จับมา ' + mmss(paperSec()) + ' จะหายไป'
             + '<br>กด "ยกเลิกรอบนี้" อีกครั้งถ้าจะยกเลิกจริง</div>'

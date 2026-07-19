@@ -229,6 +229,10 @@
 .preset{margin-top:16px;font-size:15px;color:var(--muted)}
 .pback{float:left;margin:-4px 0 0 -3px;border:0;cursor:pointer;background:var(--tan);color:var(--wood-l);
   font-weight:700;font-size:13.5px;padding:5px 12px;border-radius:16px}
+/* แถบเตือนบนการ์ดในรายการชุด — มีรอบจับเวลาค้างอยู่ */
+.pickrun{margin-top:5px;display:inline-block;font-weight:800;font-size:13.5px;
+  background:var(--gold-pale);color:var(--gold-ink);padding:3px 10px;border-radius:14px}
+.pickrun.wait{background:var(--blue);color:var(--blue-ink)}
 
 /* ── นำทาง ── */
 .nav{display:flex;gap:9px;margin-top:16px}
