@@ -11,7 +11,8 @@ const norm = h => String(h == null ? '' : h)
   .replace(/\u00B9/g, '<sup>1</sup>')    // sup 1
   .replace(/\u00B2/g, '<sup>2</sup>')    // sup 2
   .replace(/\u00B3/g, '<sup>3</sup>')    // sup 3
-  .replace(/\u00B0/g, '\u02DA');        // degree     -> ring
+  .replace(/\u00B0/g, '\u02DA')          // degree     -> ring
+  .replace(/\u2212/g, '-');              // minus sign -> hyphen (no glyph in Layiji)
 const eqAns = (a, b) =>
   String(a).trim().replace(/\s+/g, ' ').toLowerCase() ===
   String(b).trim().replace(/\s+/g, ' ').toLowerCase();

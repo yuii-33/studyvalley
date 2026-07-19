@@ -2,6 +2,16 @@
  "room": "posn-com",
  "sets": [
   {
+   "id": "260720-com-logic",
+   "date": "260720",
+   "subject": "com",
+   "title": "คอม — ตรรกะ ลูป และขั้นตอนวิธี",
+   "n": 18,
+   "targetMin": 50,
+   "week": 4,
+   "added": 1784485365982
+  },
+  {
    "id": "260716-math-logic",
    "date": "260716",
    "subject": "math",

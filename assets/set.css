@@ -136,6 +136,10 @@
 .qbody .warn,.excontent .warn{background:var(--rose);border-radius:10px;padding:9px 12px;margin-top:8px;line-height:1.6}
 .qbody .warn .h,.excontent .warn .h{font-weight:800;color:var(--rose-ink)}
 .qbody .hl td,.excontent .hl td,.qbody td.hl,.excontent td.hl{background:var(--gold-pale)}
+/* กล่องโจทย์ร่วม/ขั้นตอนวิธีที่โจทย์กำหนดให้ */
+.qbody .rule,.excontent .rule{background:var(--paper);border:1px solid var(--line);border-radius:11px;
+  padding:11px 13px;margin:9px 0 11px;font-size:15.5px;line-height:1.8}
+.qbody .rule table,.excontent .rule table{margin:7px 0;font-size:14px}
 
 /* ── ห้องปริศนา (logic) ── */
 .pzicon{display:inline-flex}
