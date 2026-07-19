@@ -3,16 +3,6 @@
    โหลดชุดจาก ../data/posn/ · เซฟความคืบหน้า 2 ที่ (localStorage + IndexedDB)
    ══════════════════════════════════════════════════════════ */
 const $ = id => document.getElementById(id);
-/* แทนอักขระ Latin-1 ที่ Layiji เรนเดอร์เพี้ยน (บั๊ก 3) ด้วยตัวที่แสดงถูก */
-const norm = h => String(h == null ? '' : h)
-  .replace(/\u00B7/g, '\u2022')          // middle dot -> bullet
-  .replace(/\u00D7/g, '\u2715')          // multiply   -> cross
-  .replace(/\u00F7/g, '/')               // divide     -> slash
-  .replace(/\u00B9/g, '<sup>1</sup>')    // sup 1
-  .replace(/\u00B2/g, '<sup>2</sup>')    // sup 2
-  .replace(/\u00B3/g, '<sup>3</sup>')    // sup 3
-  .replace(/\u00B0/g, '\u02DA')          // degree     -> ring
-  .replace(/\u2212/g, '-');              // minus sign -> hyphen (no glyph in Layiji)
 const eqAns = (a, b) =>
   String(a).trim().replace(/\s+/g, ' ').toLowerCase() ===
   String(b).trim().replace(/\s+/g, ' ').toLowerCase();
@@ -618,10 +608,11 @@ function renderPaper(){
       +   '<div class="ph">โหมดกระดาษ</div>'
       +   '<div class="psub">' + SET.n + ' ข้อ • เป้า ' + SET.targetMin + ' นาที</div>'
       +   '<ol class="psteps">'
-      +     '<li>เตรียมกระดาษ/ไอแพดให้พร้อม</li>'
+      +     '<li>เปิดใบข้อสอบ แล้วปริ้น หรือบันทึกเป็น PDF ไปเขียนบนไอแพด</li>'
       +     '<li>กดเริ่มจับเวลา แล้วลงมือได้เลย — <b>วางมือถือ ปิดจอได้ เวลายังเดินอยู่</b></li>'
       +     '<li>ทำครบแล้วกด "ทำเสร็จแล้ว" เวลาจะหยุด ค่อยมาติ๊กคำตอบทีเดียว</li>'
       +   '</ol>'
+      +   '<a class="btn soft pbig" id="pPdf" href="print.html' + roomQuery(SET.id) + '">เปิดใบข้อสอบ (ปริ้น / PDF)</a>'
       +   '<button class="btn primary pbig" id="pStart">เริ่มจับเวลา</button>'
       + '</div>';
   } else if(!done){
@@ -654,13 +645,6 @@ function renderPaper(){
 /* ── กระดาษคำตอบ : ติ๊กจากกระดาษ → ตรวจรวดเดียว → เฉลย ── */
 let pendingGrade = false;
 
-/* ข้อความในชิป: ถอด HTML เป็นข้อความก่อนตัด (กันตัดกลาง entity) แล้วค่อย escape */
-function chipText(html, max){
-  const d = document.createElement('div'); d.innerHTML = norm(html);
-  let t = (d.textContent || '').replace(/\s+/g, ' ').trim();
-  if(t.length > max) t = t.slice(0, max) + '…';
-  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
 const pickedOf = a => (a && a.pick != null && String(a.pick).trim() !== '') ? a.pick : null;
 const paperBlank = () => SET.questions.map((q, i) => i).filter(i => pickedOf(ans[i]) === null);
 
