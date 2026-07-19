@@ -41,7 +41,8 @@
 .prgrow{display:flex;align-items:flex-start;gap:9px;padding:5px 0;border-bottom:1px solid var(--line)}
 .prgno{flex:0 0 26px;font-weight:800;color:var(--ink-hi);font-size:14.5px;text-align:right}
 .prgch{flex:1;display:flex;flex-wrap:wrap;gap:5px 9px}
-.prgc{font-size:13.5px;border:1px solid var(--line);border-radius:7px;padding:2px 7px}
+.prgc{font-size:13.5px;border:1px solid var(--line);border-radius:7px;padding:2px 7px;
+  max-width:100%;overflow-wrap:anywhere}
 .prgc b{color:var(--wood);margin-right:2px}
 .prgfill{display:inline-block;border-bottom:1px solid var(--wood-d);min-width:170px;height:15px}
 

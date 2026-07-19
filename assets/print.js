@@ -44,7 +44,10 @@ function renderQ(q, i, stripped){
   return h + '</div>';
 }
 
-/* ตารางคำตอบท้ายเล่ม — ค่าตัวเลือกตรงกับกระดาษคำตอบในแอป (chipText ตัวเดียวกัน) */
+/* ตารางคำตอบท้ายเล่ม — ใช้ norm() ตัวเดียวกับแอป (ตัวอักษรต้องแปลงเหมือนกัน)
+   แต่ "ไม่ตัดข้อความ" เพราะกระดาษมีที่กว้าง โชว์เต็มอ่านง่ายกว่า
+   (จับคู่กับในแอปด้วยตัวขึ้นต้น ไม่ต้องยาวเท่ากัน) */
+const GRID_MAX = 120;
 function renderGrid(qs){
   let h = '<div class="prgrid"><div class="prgh">ตารางคำตอบ</div>'
         + '<div class="prgnote">วงตัวอักษรที่ตอบ แล้วเอามาติ๊กในแอปตามนี้</div>';
@@ -52,7 +55,7 @@ function renderGrid(qs){
     h += '<div class="prgrow"><span class="prgno">' + (i+1) + '</span>';
     if(isMC(q)){
       h += '<span class="prgch">' + q.ch.map((c, k) =>
-            '<span class="prgc"><b>' + LET[k] + '</b> ' + chipText(c) + '</span>').join('') + '</span>';
+            '<span class="prgc"><b>' + LET[k] + '</b> ' + chipText(c, GRID_MAX) + '</span>').join('') + '</span>';
     } else {
       h += '<span class="prgch"><span class="prgfill"></span></span>';
     }
