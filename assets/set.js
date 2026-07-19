@@ -636,12 +636,7 @@ function renderPaper(){
       +   '<button class="btn primary pbig" id="pDone">ทำเสร็จแล้ว</button>'
       + '</div>';
   } else {
-    const sec = paperSec(), tgt = SET.targetMin * 60;
-    h = '<div class="pcard">'
-      +   '<div class="ph">ทำเสร็จแล้ว</div>'
-      +   '<div class="pclock">' + mmss(sec) + '</div>'
-      +   '<div class="psub">' + (sec <= tgt ? 'อยู่ในเป้า ' : 'เกินเป้า ') + SET.targetMin + ' นาที</div>'
-      + '</div>';
+    h = renderSheet();          // ทำเสร็จแล้ว → กระดาษคำตอบ (ติ๊ก → ตรวจ → เฉลย)
   }
   P.innerHTML = h;
 
@@ -649,8 +644,124 @@ function renderPaper(){
   if($('pPause'))  $('pPause').onclick  = pausePaper;
   if($('pResume')) $('pResume').onclick = resumePaper;
   if($('pDone'))   $('pDone').onclick   = donePaper;
+  if($('pGrade'))  $('pGrade').onclick  = gradePaper;
+  if($('pReset'))  $('pReset').onclick  = resetPaper;
+  if(done) bindSheet(P);
 
   if(started && !done && !paused) paperClockOn(); else paperClockOff();
+}
+
+/* ── กระดาษคำตอบ : ติ๊กจากกระดาษ → ตรวจรวดเดียว → เฉลย ── */
+let pendingGrade = false;
+
+/* ข้อความในชิป: ถอด HTML เป็นข้อความก่อนตัด (กันตัดกลาง entity) แล้วค่อย escape */
+function chipText(html, max){
+  const d = document.createElement('div'); d.innerHTML = norm(html);
+  let t = (d.textContent || '').replace(/\s+/g, ' ').trim();
+  if(t.length > max) t = t.slice(0, max) + '…';
+  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+const pickedOf = a => (a && a.pick != null && String(a.pick).trim() !== '') ? a.pick : null;
+const paperBlank = () => SET.questions.map((q, i) => i).filter(i => pickedOf(ans[i]) === null);
+
+function gradePaper(){
+  const miss = paperBlank();
+  if(miss.length && !pendingGrade){ pendingGrade = true; renderPaper(); return; }   // เตือนก่อนหนึ่งครั้ง
+  pendingGrade = false;
+  ans.forEach((a, i) => {
+    a.revealed = true;
+    if(typeof XP !== 'undefined' && isCorrect(a, SET.questions[i]))
+      XP.award(ROOMCFG.xpKey + ':' + SET.id + ':' + i, ROOMCFG.xpBase);
+  });
+  paper.gradedAt = Date.now();
+  save(); renderPaper(); window.scrollTo(0, 0);
+}
+
+function renderSheet(){
+  const graded = !!paper.gradedAt, sec = paperSec(), tgt = SET.targetMin * 60;
+  let h = '<div class="pcard psheethead">';
+  if(graded){
+    const st = computeStat();
+    h += '<div class="ph">ได้ ' + st.correct + ' / ' + SET.n + '</div>'
+      +  '<div class="psub">ใช้เวลา ' + mmss(sec) + ' • '
+      +    (sec <= tgt ? 'อยู่ในเป้า ' : 'เกินเป้า ') + SET.targetMin + ' นาที</div>'
+      +  '<div class="pnote">ข้อที่ผิดกางเฉลยไว้ให้แล้ว • ข้อที่ถูกกดดูได้</div>';
+  } else {
+    h += '<div class="ph">ติ๊กคำตอบจากกระดาษ</div>'
+      +  '<div class="psub">ใช้เวลา ' + mmss(sec) + ' • ' + SET.n + ' ข้อ</div>'
+      +  '<div class="pnote">ดูตัวเลือกให้ตรงกับในกระดาษ กันติ๊กเลื่อนข้อ</div>';
+  }
+  h += '</div><div class="sheet">';
+
+  SET.questions.forEach((q, i) => {
+    const a = ans[i] || {}, ok = graded && isCorrect(a, q);
+    h += '<div class="srow' + (graded ? (ok ? ' ok' : ' no') : '') + '">'
+      +  '<div class="shead"><span class="sno">ข้อ ' + (i+1) + '</span>'
+      +  (graded ? '<span class="smark">' + (ok ? ART.sure(19) : ART['alert'](19)) + '</span>' : '')
+      +  '</div>';
+
+    if(Array.isArray(q.ch)){
+      h += '<div class="schips">' + q.ch.map((c, k) =>
+            '<button class="schip' + (pickedOf(a) !== null && eqAns(a.pick, c) ? ' on' : '')
+          + (graded && eqAns(c, q.c) ? ' ans' : '') + '" data-q="' + i + '" data-k="' + k + '"'
+          + (graded ? ' disabled' : '') + '><b>' + 'กขคง'[k] + '</b> ' + chipText(c, 22) + '</button>'
+        ).join('') + '</div>';
+    } else {
+      h += '<div class="sfill"><input class="field" data-fill="' + i + '" autocomplete="off"'
+        +  (graded ? ' disabled' : '') + ' placeholder="เขียนตอบ" value="'
+        +  (pickedOf(a) !== null ? String(a.pick).replace(/"/g, '&quot;') : '') + '"></div>';
+      if(graded && !ok) h += '<div class="sans">คำตอบ: ' + norm(q.c) + '</div>';
+    }
+
+    if(graded){
+      h += '<button class="sexp" data-ex="' + i + '">' + (ok ? 'ดูเฉลย' : 'ซ่อนเฉลย') + '</button>'
+        +  '<div class="sexbody"' + (ok ? ' style="display:none"' : '') + '>'
+        +    '<div class="qbody sq">' + norm(q.q) + '</div>'
+        +    '<div class="excontent">' + norm(q.ex) + '</div>'
+        +  '</div>';
+    }
+    h += '</div>';
+  });
+  h += '</div>';
+
+  if(!graded){
+    if(pendingGrade){
+      const miss = paperBlank();
+      h += '<div class="pwarn">ยังไม่ได้ตอบ ' + miss.length + ' ข้อ (ข้อ ' + miss.map(i => i+1).join(', ') + ')'
+         + '<br>กด "ตรวจคำตอบ" อีกครั้งถ้าจะตรวจเลย</div>';
+    }
+    h += '<button class="btn primary pbig" id="pGrade">ตรวจคำตอบ</button>';
+  } else {
+    h += '<button class="btn soft pbig preset" id="pReset">ทำชุดนี้ใหม่ • ล้างคำตอบ</button>';
+  }
+  return h;
+}
+
+function resetPaper(){          // เริ่มชุดนี้ใหม่ (XP ที่ได้ไปแล้วไม่หาย และไม่บวกซ้ำ — กันด้วย event key)
+  ans = SET.questions.map(() => ({ pick:null, revealed:false }));
+  paper = newPaper(); pendingGrade = false;
+  save(); renderPaper(); window.scrollTo(0, 0);
+}
+
+/* ผูกปุ่มแบบไม่ re-render ทั้งหน้า — กันจอเด้งกลับบนสุดตอนติ๊ก */
+function bindSheet(P){
+  P.querySelectorAll('[data-q]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.q;
+    ans[i] = ans[i] || {}; ans[i].pick = SET.questions[i].ch[+b.dataset.k];
+    b.parentNode.querySelectorAll('.schip').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    pendingGrade = false; save();
+  });
+  P.querySelectorAll('[data-fill]').forEach(inp => inp.oninput = e => {
+    const i = +inp.dataset.fill;
+    ans[i] = ans[i] || {}; ans[i].pick = e.target.value;
+    pendingGrade = false; save();
+  });
+  P.querySelectorAll('[data-ex]').forEach(b => b.onclick = () => {
+    const body = b.nextElementSibling, hidden = body.style.display === 'none';
+    body.style.display = hidden ? '' : 'none';
+    b.textContent = hidden ? 'ซ่อนเฉลย' : 'ดูเฉลย';
+  });
 }
 
 boot();
