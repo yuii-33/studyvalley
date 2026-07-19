@@ -227,6 +227,8 @@
 .pwarn{margin-top:11px;background:var(--rose);border-radius:11px;padding:10px 12px;
   font-size:14.5px;line-height:1.6;color:var(--rose-ink);text-align:center}
 .preset{margin-top:16px;font-size:15px;color:var(--muted)}
+.pback{float:left;margin:-4px 0 0 -3px;border:0;cursor:pointer;background:var(--tan);color:var(--wood-l);
+  font-weight:700;font-size:13.5px;padding:5px 12px;border-radius:16px}
 
 /* ── นำทาง ── */
 .nav{display:flex;gap:9px;margin-top:16px}
